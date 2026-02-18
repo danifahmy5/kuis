@@ -25,4 +25,29 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+    public function display(\App\Models\Event $event)
+    {
+        return view('display', compact('event'));
+    }
+
+    public function displayState(\App\Models\Event $event)
+    {
+        $event->load(['questions' => function ($query) {
+            $query->orderBy('seq');
+        }]);
+
+        $currentQuestion = null;
+        if (isset($event->config['current_question_seq'])) {
+            $currentQuestion = $event->questions()
+                ->wherePivot('seq', $event->config['current_question_seq'])
+                ->with('options')
+                ->first();
+        }
+
+        return response()->json([
+            'event' => $event,
+            'current_question' => $currentQuestion,
+        ]);
+    }
 }

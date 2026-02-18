@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
             $table->foreignId('contestant_id')->constrained()->onDelete('cascade');
             $table->boolean('is_correct');
-            $table->foreignId('marked_by_admin')->constrained('admins');
+            $table->foreignId('marked_by')->constrained('users');
             $table->timestamp('marked_at');
             $table->integer('points_awarded')->default(0);
             $table->timestamps();

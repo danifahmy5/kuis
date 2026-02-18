@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('finished_at')->nullable();
             $table->enum('status', ['draft', 'running', 'paused', 'finished'])->default('draft');
             $table->json('config')->nullable();
-            $table->foreignId('created_by')->constrained('admins');
+            $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });
     }

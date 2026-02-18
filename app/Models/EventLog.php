@@ -11,7 +11,7 @@ class EventLog extends Model
 
     protected $fillable = [
         'event_id',
-        'admin_id',
+        'user_id',
         'action_type',
         'payload',
     ];
@@ -25,8 +25,8 @@ class EventLog extends Model
         return $this->belongsTo(Event::class);
     }
 
-    public function admin()
+    public function user()
     {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(User::class);
     }
 }

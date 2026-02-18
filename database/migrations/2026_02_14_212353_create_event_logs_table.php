@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('event_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->foreignId('admin_id')->constrained('admins');
+            $table->foreignId('user_id')->constrained('users');
             $table->string('action_type');
             $table->json('payload')->nullable();
             $table->timestamps();

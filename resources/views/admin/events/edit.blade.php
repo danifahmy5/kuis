@@ -1,15 +1,77 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
-    <h1>Edit Event</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{ __('Edit Acara') }}</div>
 
-    <form action="{{ route('admin.events.update', $event) }}" method="POST">
-        @csrf
-        @method('PUT')
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ $event->title }}" required>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('events.update', $event->id) }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="row mb-3">
+                            <label for="title" class="col-md-4 col-form-label text-md-end">{{ __('Judul Acara') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="title" type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title', $event->title) }}" required autofocus>
+
+                                @error('title')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="status" class="col-md-4 col-form-label text-md-end">{{ __('Status') }}</label>
+
+                            <div class="col-md-6">
+                                <select name="status" id="status" class="form-control @error('status') is-invalid @enderror">
+                                    <option value="draft" {{ $event->status == 'draft' ? 'selected' : '' }}>Draft</option>
+                                    <option value="running" {{ $event->status == 'running' ? 'selected' : '' }}>Berlangsung</option>
+                                    <option value="paused" {{ $event->status == 'paused' ? 'selected' : '' }}>Jeda</option>
+                                    <option value="finished" {{ $event->status == 'finished' ? 'selected' : '' }}>Selesai</option>
+                                </select>
+
+                                @error('status')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="config" class="col-md-4 col-form-label text-md-end">{{ __('Konfigurasi (JSON)') }}</label>
+
+                            <div class="col-md-6">
+                                <textarea id="config" class="form-control @error('config') is-invalid @enderror" name="config" rows="3">{{ old('config', json_encode($event->config)) }}</textarea>
+                                <small class="text-muted">Opsional. Format JSON valid.</small>
+
+                                @error('config')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Perbarui Acara') }}
+                                </button>
+                                <a href="{{ route('events.index') }}" class="btn btn-secondary">Batal</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    </div>
+</div>
 @endsection

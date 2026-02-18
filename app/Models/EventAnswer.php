@@ -14,7 +14,7 @@ class EventAnswer extends Model
         'question_id',
         'contestant_id',
         'is_correct',
-        'marked_by_admin',
+        'marked_by',
         'marked_at',
         'points_awarded',
     ];
@@ -41,6 +41,6 @@ class EventAnswer extends Model
 
     public function marker()
     {
-        return $this->belongsTo(Admin::class, 'marked_by_admin');
+        return $this->belongsTo(User::class, 'marked_by');
     }
 }

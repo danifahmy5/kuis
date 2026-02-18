@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\EventQuestionController;
 use App\Http\Controllers\Admin\LeaderboardController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/admin/login');
 });
 
 // Dummy admin login - replace with a real auth controller

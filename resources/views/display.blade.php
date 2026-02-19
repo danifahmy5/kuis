@@ -78,16 +78,171 @@
             padding: 24px;
         }
 
+        .display-topbar {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .branding-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: rgba(10, 46, 92, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            pointer-events: auto;
+        }
+
+        .branding-badge img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .branding-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .topbar-btn {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .topbar-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .leaderboard-panel {
+            position: fixed;
+            top: 84px;
+            right: 16px;
+            width: min(440px, calc(100vw - 32px));
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            z-index: 35;
+            background: rgba(7, 20, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .leaderboard-panel h5 {
+            margin-bottom: 14px;
+            font-weight: 700;
+            color: var(--primary-gold);
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            margin-bottom: 8px;
+        }
+
+        .rank-chip {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffe083;
+        }
+
+        .score-chip {
+            font-weight: 700;
+            color: #fff;
+            background: rgba(25, 135, 84, 0.26);
+            border: 1px solid rgba(67, 170, 121, 0.4);
+            border-radius: 999px;
+            padding: 4px 12px;
+        }
+
+        .leaderboard-empty {
+            color: #d1d8e3;
+            text-align: center;
+            margin: 8px 0 2px;
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        .display-footer {
+            position: fixed;
+            bottom: 14px;
+            right: 18px;
+            z-index: 25;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.78rem;
+            letter-spacing: 0.4px;
+            color: rgba(232, 238, 249, 0.75);
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+            opacity: 0.9;
+        }
+
+        .display-footer i {
+            font-size: 0.72rem;
+            opacity: 0.85;
+        }
+
+        .display-footer strong {
+            color: rgba(255, 255, 255, 0.92);
+            font-weight: 600;
+        }
+
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 24px;
-            padding: 4rem;
+            padding: 4.5rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            max-width: 1000px;
-            width: 90%;
+            max-width: 1200px;
+            width: 94%;
             text-align: center;
             animation: slideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
@@ -103,7 +258,7 @@
 
         .event-title {
             font-family: 'Cinzel', serif;
-            font-size: 4rem;
+            font-size: clamp(3.4rem, 6vw, 5.4rem);
             font-weight: 700;
             color: #fff;
             margin-bottom: 1.5rem;
@@ -174,30 +329,34 @@
         }
 
         .timer {
-            font-size: 5rem;
+            font-size: clamp(4.8rem, 9vw, 8rem);
             font-weight: 800;
-            margin: 20px 0;
+            margin: 22px 0 26px;
             color: var(--primary-gold);
             text-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
+            line-height: 1;
         }
 
         .question-text {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
+            font-size: clamp(2.2rem, 4.2vw, 3.8rem);
+            margin-bottom: 36px;
             font-weight: 600;
+            line-height: 1.3;
         }
 
         .options-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
         }
 
         .option-item {
             background: rgba(255, 255, 255, 0.9);
             color: #0a2e5c;
-            padding: 18px 20px;
-            font-size: 1.35rem;
+            padding: 24px 24px;
+            font-size: clamp(1.3rem, 2.2vw, 2rem);
+            line-height: 1.35;
+            font-weight: 600;
             border-radius: 12px;
             text-align: left;
             transition: all 0.3s;
@@ -211,13 +370,27 @@
 
         .intro-title {
             font-family: 'Cinzel', serif;
-            font-size: 4rem;
+            font-size: clamp(3.2rem, 5.5vw, 5rem);
             font-weight: 700;
         }
 
         .intro-desc {
-            font-size: 2rem;
+            font-size: clamp(1.6rem, 3vw, 2.6rem);
             color: #b8c6db;
+        }
+
+        @media (min-width: 1366px) {
+            .glass-card {
+                padding: 5rem 5.25rem;
+            }
+
+            .countdown-number {
+                font-size: 3.4rem;
+            }
+
+            .countdown-label {
+                font-size: 0.95rem;
+            }
         }
 
         @keyframes pulse-red {
@@ -247,6 +420,29 @@
             .intro-desc { font-size: 1.4rem; }
             .countdown-container { gap: 1rem; }
             .countdown-number { font-size: 2rem; }
+            .display-topbar {
+                top: 12px;
+                left: 12px;
+                right: 12px;
+            }
+            .branding-text {
+                display: none;
+            }
+            .topbar-btn {
+                padding: 8px 12px;
+                font-size: 0.82rem;
+            }
+            .leaderboard-panel {
+                top: 70px;
+                right: 12px;
+                left: 12px;
+                width: auto;
+            }
+            .display-footer {
+                right: 12px;
+                bottom: 10px;
+                font-size: 0.72rem;
+            }
         }
     </style>
 </head>
@@ -256,6 +452,26 @@
     </div>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
+
+    <div class="display-topbar">
+        <div class="branding-badge">
+            <img src="{{ asset('logo.png') }}" alt="Logo">
+            <span class="branding-text">Quiz Arena</span>
+        </div>
+        <div class="topbar-actions">
+            <button type="button" class="topbar-btn" id="leaderboard-toggle">
+                <i class="fas fa-trophy me-1"></i>Leaderboard
+            </button>
+            <button type="button" class="topbar-btn" id="fullscreen-toggle">
+                <i class="fas fa-expand me-1"></i>Fullscreen
+            </button>
+        </div>
+    </div>
+
+    <div class="leaderboard-panel d-none" id="leaderboard-panel">
+        <h5><i class="fas fa-ranking-star me-2"></i>Leaderboard</h5>
+        <div id="leaderboard-list"></div>
+    </div>
 
     <div class="main-content">
         <div class="glass-card" id="app">
@@ -268,11 +484,20 @@
         </div>
     </div>
 
+    <div class="display-footer">
+        <i class="fas fa-sparkles"></i>
+        crafted by <strong>danifahmy5</strong>
+    </div>
+
     <script>
         const eventId = {{ $event->id }};
         let lastState = null;
         let timerInterval = null;
         let countdownInterval = null;
+        const leaderboardPanel = document.getElementById('leaderboard-panel');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const leaderboardToggle = document.getElementById('leaderboard-toggle');
+        const fullscreenToggle = document.getElementById('fullscreen-toggle');
 
         async function fetchState() {
             try {
@@ -286,6 +511,7 @@
 
         function updateUI(data) {
             const app = document.getElementById('app');
+            renderLeaderboard(data.leaderboard || []);
             
             // Check if intro
             if (data.event.is_intro) {
@@ -374,6 +600,29 @@
             }
         }
 
+        function renderLeaderboard(leaderboard) {
+            if (!leaderboardList) return;
+
+            if (!leaderboard.length) {
+                leaderboardList.innerHTML = `<div class="leaderboard-empty">Belum ada skor peserta.</div>`;
+                return;
+            }
+
+            leaderboardList.innerHTML = leaderboard.map((item, index) => {
+                const teamText = item.team_name ? `<small class="text-white-50 d-block">${item.team_name}</small>` : '';
+                return `
+                    <div class="leaderboard-item">
+                        <div class="rank-chip">${index + 1}</div>
+                        <div>
+                            <div class="fw-bold">${item.name}</div>
+                            ${teamText}
+                        </div>
+                        <div class="score-chip">${item.total_points} pts</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function startLocalTimer(startedAt, stoppedAt, duration) {
             clearInterval(timerInterval);
             const timerDisplay = document.getElementById('timer-display');
@@ -439,6 +688,44 @@
             update();
             countdownInterval = setInterval(update, 1000);
         }
+
+        function isFullscreenActive() {
+            return Boolean(document.fullscreenElement);
+        }
+
+        function updateFullscreenButton() {
+            if (!fullscreenToggle) return;
+            if (isFullscreenActive()) {
+                fullscreenToggle.innerHTML = '<i class="fas fa-compress me-1"></i>Exit Fullscreen';
+            } else {
+                fullscreenToggle.innerHTML = '<i class="fas fa-expand me-1"></i>Fullscreen';
+            }
+        }
+
+        if (leaderboardToggle) {
+            leaderboardToggle.addEventListener('click', () => {
+                leaderboardPanel.classList.toggle('d-none');
+            });
+        }
+
+        if (fullscreenToggle) {
+            fullscreenToggle.addEventListener('click', async () => {
+                try {
+                    if (isFullscreenActive()) {
+                        await document.exitFullscreen();
+                    } else {
+                        await document.documentElement.requestFullscreen();
+                    }
+                } catch (error) {
+                    console.error('Fullscreen toggle failed:', error);
+                } finally {
+                    updateFullscreenButton();
+                }
+            });
+        }
+
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        updateFullscreenButton();
 
         // Poll every 2 seconds
         setInterval(fetchState, 2000);

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EventAnswer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -35,7 +37,7 @@ class HomeController extends Controller
     {
         $event->load(['questions' => function ($query) {
             $query->orderBy('seq');
-        }]);
+        }, 'contestants']);
 
         $currentQuestion = null;
         if ($event->current_question_seq) {
@@ -45,9 +47,28 @@ class HomeController extends Controller
                 ->first();
         }
 
+        $scores = EventAnswer::query()
+            ->select('contestant_id', DB::raw('COALESCE(SUM(points_awarded), 0) as total_points'))
+            ->where('event_id', $event->id)
+            ->groupBy('contestant_id')
+            ->pluck('total_points', 'contestant_id');
+
+        $leaderboard = $event->contestants
+            ->map(function ($contestant) use ($scores) {
+                return [
+                    'id' => $contestant->id,
+                    'name' => $contestant->name,
+                    'team_name' => $contestant->team_name,
+                    'total_points' => (int) ($scores[$contestant->id] ?? 0),
+                ];
+            })
+            ->sortByDesc('total_points')
+            ->values();
+
         return response()->json([
             'event' => $event,
             'current_question' => $currentQuestion,
+            'leaderboard' => $leaderboard,
         ]);
     }
 }

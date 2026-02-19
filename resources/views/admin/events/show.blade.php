@@ -61,111 +61,117 @@
 @section('content')
     <div class="py-4">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <!-- Header Card -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h2 class="mb-1 fw-bold">{{ $event->title }}</h2>
-                                <div class="mt-2">
-                                    @if ($event->status == 'draft')
-                                        <span class="badge rounded-pill bg-secondary px-3">Draft</span>
-                                    @elseif($event->status == 'running')
-                                        <span class="badge rounded-pill bg-success px-3">Berlangsung</span>
-                                    @elseif($event->status == 'paused')
-                                        <span class="badge rounded-pill bg-warning text-dark px-3">Jeda</span>
-                                    @elseif($event->status == 'finished')
-                                        <span class="badge rounded-pill bg-dark px-3">Selesai</span>
-                                    @endif
-                                    <span class="text-muted ms-2 small"><i class="bi bi-clock"></i>
-                                        {{ $event->created_at->format('d M Y, H:i') }}</span>
-                                </div>
-                            </div>
-                            <a href="{{ route('events.index') }}" class="btn btn-outline-secondary btn-sm">
-                                &larr; Kembali
-                            </a>
-                        </div>
+            <div class="col-xl-11">
+                @php
+                    $showControlPanel = $event->status == 'running' && $event->quiz_started;
+                @endphp
 
-                        <hr class="my-4">
-
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted text-uppercase small fw-bold mb-2">Informasi Penyelenggara</h6>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle p-2 me-3 text-center"
-                                        style="width: 45px; height: 45px;">
-                                        <span class="fw-bold text-primary">{{ substr($event->creator->name, 0, 1) }}</span>
-                                    </div>
+                <div class="row g-4 align-items-start">
+                    <div class="{{ $showControlPanel ? 'col-xl-4' : 'col-12' }}">
+                        <!-- Header Card -->
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <p class="mb-0 fw-bold text-dark">{{ $event->creator->name }}</p>
-                                        <small class="text-muted">Creator</small>
+                                        <h2 class="mb-1 fw-bold">{{ $event->title }}</h2>
+                                        <div class="mt-2">
+                                            @if ($event->status == 'draft')
+                                                <span class="badge rounded-pill bg-secondary px-3">Draft</span>
+                                            @elseif($event->status == 'running')
+                                                <span class="badge rounded-pill bg-success px-3">Berlangsung</span>
+                                            @elseif($event->status == 'paused')
+                                                <span class="badge rounded-pill bg-warning text-dark px-3">Jeda</span>
+                                            @elseif($event->status == 'finished')
+                                                <span class="badge rounded-pill bg-dark px-3">Selesai</span>
+                                            @endif
+                                            <span class="text-muted ms-2 small"><i class="bi bi-clock"></i>
+                                                {{ $event->created_at->format('d M Y, H:i') }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('events.index') }}" class="btn btn-outline-secondary btn-sm">
+                                        &larr; Kembali
+                                    </a>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="row g-4">
+                                    <div class="col-md-6 {{ $showControlPanel ? 'col-xl-12' : '' }}">
+                                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Informasi Penyelenggara</h6>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle p-2 me-3 text-center"
+                                                style="width: 45px; height: 45px;">
+                                                <span class="fw-bold text-primary">{{ substr($event->creator->name, 0, 1) }}</span>
+                                            </div>
+                                            <div>
+                                                <p class="mb-0 fw-bold text-dark">{{ $event->creator->name }}</p>
+                                                <small class="text-muted">Creator</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 {{ $showControlPanel ? 'col-xl-12' : '' }}">
+                                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Daftar Peserta</h6>
+                                        @if ($event->contestants->isEmpty())
+                                            <span class="text-muted fst-italic">Belum ada peserta terdaftar.</span>
+                                        @else
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach ($event->contestants as $contestant)
+                                                    <span class="badge bg-light text-dark border border-light-subtle">
+                                                        {{ $contestant->name }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted text-uppercase small fw-bold mb-2">Daftar Peserta</h6>
-                                @if ($event->contestants->isEmpty())
-                                    <span class="text-muted fst-italic">Belum ada peserta terdaftar.</span>
-                                @else
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @foreach ($event->contestants as $contestant)
-                                            <span class="badge bg-light text-dark border border-light-subtle">
-                                                {{ $contestant->name }}
-                                            </span>
-                                        @endforeach
+
+                            <!-- Action Bar -->
+                            <div class="card-footer bg-white border-top p-3">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        @if ($event->status == 'draft')
+                                            <form action="{{ route('events.start-intro', $event->id) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-play-fill"></i> Mulai Acara (Intro)
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if ($event->status == 'running' && $event->is_intro)
+                                            <form action="{{ route('events.start-quiz', $event->id) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi bi-lightning-fill"></i> Mulai Kuis
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
-                                @endif
+
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('events.edit', $event->id) }}"
+                                            class="btn btn-outline-warning text-dark">
+                                            Edit
+                                        </a>
+
+                                        <form action="{{ route('events.destroy', $event->id) }}" method="POST"
+                                            class="d-inline" onsubmit="return confirm('Yakin ingin menghapus acara ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="btn btn-outline-danger border-start-0 rounded-0 rounded-end">Hapus</button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action Bar -->
-                    <div class="card-footer bg-white border-top p-3">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div>
-                                @if ($event->status == 'draft')
-                                    <form action="{{ route('events.start-intro', $event->id) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-play-fill"></i> Mulai Acara (Intro)
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if ($event->status == 'running' && $event->is_intro)
-                                    <form action="{{ route('events.start-quiz', $event->id) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="bi bi-lightning-fill"></i> Mulai Kuis
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-
-                            <div class="btn-group" role="group">
-                                <a href="{{ route('events.edit', $event->id) }}" class="btn btn-outline-warning text-dark">
-                                    Edit
-                                </a>
-
-                                <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('Yakin ingin menghapus acara ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="btn btn-outline-danger border-start-0 rounded-0 rounded-end">Hapus</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                @if ($event->status == 'running' && $event->quiz_started)
-                    <div class="row justify-content-center">
-                        <div class="col-lg-12">
-
+                    @if ($showControlPanel)
+                        <div class="col-xl-8">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div>
                                     <h5 class="fw-bold text-dark m-0 ls-tight">
@@ -323,10 +329,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-
-                @endif
+                    @endif
+                </div>
             </div>
         </div>
     </div>

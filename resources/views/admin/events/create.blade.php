@@ -45,13 +45,12 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="config" class="col-md-4 col-form-label text-md-end">{{ __('Konfigurasi (JSON)') }}</label>
+                            <label for="started_at" class="col-md-4 col-form-label text-md-end">{{ __('Mulai') }}</label>
 
                             <div class="col-md-6">
-                                <textarea id="config" class="form-control @error('config') is-invalid @enderror" name="config" rows="3">{{ old('config') }}</textarea>
-                                <small class="text-muted">Opsional. Format JSON valid.</small>
+                                <input id="started_at" type="datetime-local" class="form-control @error('started_at') is-invalid @enderror" name="started_at" value="{{ old('started_at') }}" required>
 
-                                @error('config')
+                                @error('started_at')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -59,6 +58,28 @@
                             </div>
                         </div>
 
+                        <hr>
+                        <div class="row mb-3">
+                            <label class="col-md-4 col-form-label text-md-end">{{ __('Peserta') }}</label>
+                            <div class="col-md-6">
+                                <input type="text" id="contestant-search" class="form-control mb-2" placeholder="Cari peserta...">
+                                <div class="border rounded p-2" style="max-height: 260px; overflow-y: auto;">
+                                    @forelse($contestants as $contestant)
+                                        <div class="form-check contestant-item" data-name="{{ strtolower($contestant->name) }}">
+                                            <input class="form-check-input" type="checkbox" name="contestant_ids[]" value="{{ $contestant->id }}" id="contestant-{{ $contestant->id }}" {{ in_array($contestant->id, old('contestant_ids', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="contestant-{{ $contestant->id }}">
+                                                {{ $contestant->name }}
+                                            </label>
+                                        </div>
+                                    @empty
+                                        <div class="text-muted">Belum ada peserta.</div>
+                                    @endforelse
+                                </div>
+                                @error('contestant_ids')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
@@ -73,4 +94,20 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+    (function () {
+        const search = document.getElementById('contestant-search');
+        const items = document.querySelectorAll('.contestant-item');
+        if (!search) return;
+        search.addEventListener('input', () => {
+            const q = search.value.trim().toLowerCase();
+            items.forEach(item => {
+                const name = item.getAttribute('data-name') || '';
+                item.style.display = name.includes(q) ? '' : 'none';
+            });
+        });
+    })();
+</script>
+@endpush
 @endsection

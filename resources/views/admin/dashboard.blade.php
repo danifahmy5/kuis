@@ -3,56 +3,6 @@
 @push('styles')
     <style>
         .feature-icon-1 {
-            font-size: 48px;
-            margin-bottom: 1rem;
-        }
-
-        .report-card {
-            border-radius: 10px;
-            color: #fff;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .report-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-        }
-
-        .report-card .report-main-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .report-card .report-main-icon i {
-            font-size: 24px;
-            color: #fff;
-        }
-
-        .quick-menu-card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05) !important;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .quick-menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1) !important;
-        }
-
-    </style>
-@endpush
-
-@extends('layouts.app')
-
-@push('styles')
-    <style>
-        .feature-icon-1 {
             font-size: 40px;
             margin-bottom: 1rem;
         }
@@ -125,7 +75,7 @@
                 <div class="card welcome-card border-0 shadow-sm">
                     <div class="card-body p-4">
                         <div class="row align-items-center">
-                            <div class="col-md-8">
+                            <div class="col-md-8 text-light">
                                 <h2 class="fw-bold mb-1">Selamat Datang Kembali, {{ Auth::user()->name }}! 👋</h2>
                                 <p class="opacity-75 mb-0">Kelola acara, soal, dan peserta kuis Anda dari satu tempat yang efisien.</p>
                             </div>

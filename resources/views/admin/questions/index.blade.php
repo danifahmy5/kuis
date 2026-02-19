@@ -28,6 +28,7 @@
                             <th class="ps-4" style="width: 50px;">No</th>
                             <th>Pertanyaan</th>
                             <th>Tingkat Kesulitan</th>
+                            <th>Durasi</th>
                             <th class="text-end pe-4" style="width: 250px;">Aksi</th>
                         </tr>
                     </thead>
@@ -59,6 +60,7 @@
                                         </span>
                                     @endif
                                 </td>
+                                <td>{{ $question->duration }} detik</td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group shadow-sm">
                                         <a href="{{ route('questions.show', $question->id) }}" class="btn btn-sm btn-outline-info" title="Detail">
@@ -79,7 +81,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center py-5">
+                                <td colspan="5" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="fas fa-book-open fa-3x mb-3 opacity-25"></i>
                                         <p>Belum ada soal kuis yang dibuat.</p>

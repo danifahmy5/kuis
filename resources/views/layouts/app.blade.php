@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
@@ -21,6 +22,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     @stack('styles')
+    @vite(['resources/sass/app.scss'])
     <style>
         :root {
             --primary-color: #4361ee;
@@ -103,21 +105,21 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
-            @auth('admin')
+            @if (Auth::guard('admin')->check() || Auth::check())
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('events.index') }}">{{ __('Acara') }}</a>
+                        <a class="nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}" href="{{ route('events.index') }}">{{ __('Acara') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('questions.index') }}">{{ __('Bank Soal') }}</a>
+                        <a class="nav-link {{ request()->routeIs('questions.*') ? 'active' : '' }}" href="{{ route('questions.index') }}">{{ __('Bank Soal') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contestants.index') }}">{{ __('Peserta') }}</a>
+                        <a class="nav-link {{ request()->routeIs('contestants.*') ? 'active' : '' }}" href="{{ route('contestants.index') }}">{{ __('Peserta') }}</a>
                     </li>
                 </ul>
             @else
                 <ul class="navbar-nav me-auto"></ul>
-            @endauth
+            @endif
 
 
             <!-- Right Side Of Navbar -->
@@ -185,5 +187,6 @@
     <script>
       feather.replace()
     </script>
+    @stack('scripts')
 </body>
 </html>

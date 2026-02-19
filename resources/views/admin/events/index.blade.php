@@ -27,6 +27,7 @@
                         <tr>
                             <th class="ps-4" style="width: 50px;">No</th>
                             <th>Judul Acara</th>
+                            <th>Mulai</th>
                             <th>Status</th>
                             <th>Dibuat Oleh</th>
                             <th class="text-end pe-4" style="width: 250px;">Aksi</th>
@@ -37,6 +38,9 @@
                             <tr>
                                 <td class="ps-4 fw-medium text-muted">{{ $loop->iteration }}</td>
                                 <td class="fw-semibold">{{ $event->title }}</td>
+                                <td class="text-muted">
+                                    {{ $event->started_at ? $event->started_at->format('d M Y H:i') : '-' }}
+                                </td>
                                 <td>
                                     @if($event->status == 'draft')
                                         <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">

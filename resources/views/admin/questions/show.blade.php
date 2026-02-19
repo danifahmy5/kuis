@@ -31,6 +31,10 @@
                                 <span class="badge bg-dark">Expert</span>
                             @endif
                         </div>
+                        <div class="col-md-6">
+                            <strong>Durasi:</strong>
+                            <span class="badge bg-primary">{{ $question->duration }} detik</span>
+                        </div>
                     </div>
 
                     @if($question->explanation)

@@ -19,6 +19,7 @@ class EventSeeder extends Seeder
         $event = Event::create([
             'title' => 'My First Quiz Event',
             'created_by' => Admin::first()->id,
+            'started_at' => now()->addMinutes(10),
         ]);
 
         // Attach contestants

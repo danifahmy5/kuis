@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contestant;
 use App\Models\Event;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +25,8 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('admin.events.create');
+        $contestants = Contestant::orderBy('name')->get();
+        return view('admin.events.create', compact('contestants'));
     }
 
     /**
@@ -33,13 +36,17 @@ class EventController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'started_at' => 'required|date',
             'status' => 'required|in:draft,running,paused,finished',
-            'config' => 'nullable|json',
+            'contestant_ids' => 'nullable|array',
+            'contestant_ids.*' => 'integer|exists:contestants,id',
         ]);
 
+        $validated['started_at'] = Carbon::parse($validated['started_at']);
         $event = new Event($validated);
         $event->created_by = Auth::id();
         $event->save();
+        $event->contestants()->sync($request->input('contestant_ids', []));
 
         return redirect()->route('events.index')
             ->with('success', 'Acara berhasil dibuat.');
@@ -55,9 +62,9 @@ class EventController extends Controller
         }, 'contestants']);
 
         $currentQuestion = null;
-        if (isset($event->config['current_question_seq'])) {
+        if ($event->current_question_seq) {
             $currentQuestion = $event->questions()
-                ->wherePivot('seq', $event->config['current_question_seq'])
+                ->wherePivot('seq', $event->current_question_seq)
                 ->with('options')
                 ->first();
         }
@@ -67,14 +74,16 @@ class EventController extends Controller
 
     public function startIntro(Event $event)
     {
-        $config = $event->config ?? [];
-        $config['is_intro'] = true;
-        $config['quiz_started'] = false;
-        
+        $startedAt = $event->started_at ?? now();
         $event->update([
             'status' => 'running',
-            'config' => $config,
-            'started_at' => now(),
+            'is_intro' => true,
+            'quiz_started' => false,
+            'current_question_seq' => null,
+            'question_state' => null,
+            'timer_started_at' => null,
+            'timer_stopped_at' => null,
+            'started_at' => $startedAt,
         ]);
 
         return back()->with('success', 'Acara dimulai (Intro).');
@@ -82,30 +91,29 @@ class EventController extends Controller
 
     public function startQuiz(Event $event)
     {
-        $config = $event->config ?? [];
-        $config['is_intro'] = false;
-        $config['quiz_started'] = true;
-        $config['current_question_seq'] = 1;
-        $config['question_state'] = 'blurred';
-        $config['timer_started_at'] = null;
-        $config['timer_stopped_at'] = null;
-
-        $event->update(['config' => $config]);
+        $event->update([
+            'is_intro' => false,
+            'quiz_started' => true,
+            'current_question_seq' => 1,
+            'question_state' => 'blurred',
+            'timer_started_at' => null,
+            'timer_stopped_at' => null,
+        ]);
 
         return back()->with('success', 'Kuis dimulai!');
     }
 
     public function nextQuestion(Event $event)
     {
-        $config = $event->config ?? [];
         $maxSeq = $event->questions()->max('seq');
-        
-        if ($config['current_question_seq'] < $maxSeq) {
-            $config['current_question_seq']++;
-            $config['question_state'] = 'blurred';
-            $config['timer_started_at'] = null;
-            $config['timer_stopped_at'] = null;
-            $event->update(['config' => $config]);
+
+        if ($event->current_question_seq && $event->current_question_seq < $maxSeq) {
+            $event->update([
+                'current_question_seq' => $event->current_question_seq + 1,
+                'question_state' => 'blurred',
+                'timer_started_at' => null,
+                'timer_stopped_at' => null,
+            ]);
         }
 
         return back();
@@ -113,14 +121,13 @@ class EventController extends Controller
 
     public function prevQuestion(Event $event)
     {
-        $config = $event->config ?? [];
-        
-        if ($config['current_question_seq'] > 1) {
-            $config['current_question_seq']--;
-            $config['question_state'] = 'blurred';
-            $config['timer_started_at'] = null;
-            $config['timer_stopped_at'] = null;
-            $event->update(['config' => $config]);
+        if ($event->current_question_seq && $event->current_question_seq > 1) {
+            $event->update([
+                'current_question_seq' => $event->current_question_seq - 1,
+                'question_state' => 'blurred',
+                'timer_started_at' => null,
+                'timer_stopped_at' => null,
+            ]);
         }
 
         return back();
@@ -128,29 +135,29 @@ class EventController extends Controller
 
     public function unblurQuestion(Event $event)
     {
-        $config = $event->config ?? [];
-        $config['question_state'] = 'unblurred';
-        $config['timer_started_at'] = now()->timestamp;
-        $config['timer_stopped_at'] = null;
-        $event->update(['config' => $config]);
+        $event->update([
+            'question_state' => 'unblurred',
+            'timer_started_at' => now()->timestamp,
+            'timer_stopped_at' => null,
+        ]);
 
         return back();
     }
 
     public function stopTimer(Event $event)
     {
-        $config = $event->config ?? [];
-        $config['timer_stopped_at'] = now()->timestamp;
-        $event->update(['config' => $config]);
+        $event->update([
+            'timer_stopped_at' => now()->timestamp,
+        ]);
 
         return back();
     }
 
     public function revealAnswer(Event $event)
     {
-        $config = $event->config ?? [];
-        $config['question_state'] = 'revealed';
-        $event->update(['config' => $config]);
+        $event->update([
+            'question_state' => 'revealed',
+        ]);
 
         return back();
     }
@@ -163,7 +170,7 @@ class EventController extends Controller
         ]);
 
         $currentQuestion = $event->questions()
-            ->wherePivot('seq', $event->config['current_question_seq'])
+            ->wherePivot('seq', $event->current_question_seq)
             ->first();
 
         foreach ($request->contestant_ids as $contestantId) {
@@ -190,7 +197,9 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        return view('admin.events.edit', compact('event'));
+        $contestants = Contestant::orderBy('name')->get();
+        $selectedContestantIds = $event->contestants()->pluck('contestants.id')->toArray();
+        return view('admin.events.edit', compact('event', 'contestants', 'selectedContestantIds'));
     }
 
     /**
@@ -200,11 +209,15 @@ class EventController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'started_at' => 'required|date',
             'status' => 'required|in:draft,running,paused,finished',
-            'config' => 'nullable|json',
+            'contestant_ids' => 'nullable|array',
+            'contestant_ids.*' => 'integer|exists:contestants,id',
         ]);
 
+        $validated['started_at'] = Carbon::parse($validated['started_at']);
         $event->update($validated);
+        $event->contestants()->sync($request->input('contestant_ids', []));
 
         return redirect()->route('events.index')
             ->with('success', 'Acara berhasil diperbarui.');

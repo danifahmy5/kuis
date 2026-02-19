@@ -13,6 +13,7 @@ class Question extends Model
         'question_text',
         'difficulty_level',
         'explanation',
+        'duration',
     ];
 
     public function options()

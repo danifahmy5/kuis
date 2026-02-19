@@ -37,6 +37,15 @@
                                     </span>
                                 @enderror
                             </div>
+                            <div class="col-md-6">
+                                <label for="duration" class="form-label">{{ __('Durasi (detik)') }}</label>
+                                <input id="duration" type="number" class="form-control @error('duration') is-invalid @enderror" name="duration" value="{{ old('duration', 10) }}" min="1" max="3600" required>
+                                @error('duration')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="mb-3">

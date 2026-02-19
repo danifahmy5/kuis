@@ -13,10 +13,15 @@ class ContestantSeeder extends Seeder
      */
     public function run(): void
     {
-        Contestant::create(['name' => 'John Doe', 'team_name' => 'Team A']);
-        Contestant::create(['name' => 'Jane Smith', 'team_name' => 'Team B']);
-        Contestant::create(['name' => 'Peter Jones', 'team_name' => 'Team C']);
-        Contestant::create(['name' => 'Mary Williams', 'team_name' => 'Team A']);
-        Contestant::create(['name' => 'David Brown', 'team_name' => 'Team B']);
+        Contestant::create(['name' => 'Mulyono', 'team_name' => 'Team A']);
+        Contestant::create(['name' => 'Sumanto', 'team_name' => 'Team B']);
+
+        $faker = fake('id_ID');
+        for ($i = 0; $i < 5; $i++) {
+            Contestant::create([
+                'name' => $faker->name(),
+                'team_name' => 'Team ' . $faker->randomElement(['A', 'B', 'C']),
+            ]);
+        }
     }
 }

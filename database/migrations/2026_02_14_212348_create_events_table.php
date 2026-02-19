@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->timestamp('started_at')->nullable();
+            $table->timestamp('started_at');
             $table->timestamp('finished_at')->nullable();
             $table->enum('status', ['draft', 'running', 'paused', 'finished'])->default('draft');
             $table->json('config')->nullable();

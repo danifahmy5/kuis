@@ -38,9 +38,9 @@ class HomeController extends Controller
         }]);
 
         $currentQuestion = null;
-        if (isset($event->config['current_question_seq'])) {
+        if ($event->current_question_seq) {
             $currentQuestion = $event->questions()
-                ->wherePivot('seq', $event->config['current_question_seq'])
+                ->wherePivot('seq', $event->current_question_seq)
                 ->with('options')
                 ->first();
         }

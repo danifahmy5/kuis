@@ -35,6 +35,7 @@ class QuestionController extends Controller
         $request->validate([
             'question_text' => 'required|string',
             'difficulty_level' => 'required|integer|min:1|max:5',
+            'duration' => 'required|integer|min:1|max:3600',
             'options' => 'required|array|min:2',
             'options.*' => 'required|string',
             'correct_option' => 'required|integer|min:0'
@@ -45,6 +46,7 @@ class QuestionController extends Controller
                 'question_text' => $request->question_text,
                 'difficulty_level' => $request->difficulty_level,
                 'explanation' => $request->explanation,
+                'duration' => $request->duration,
             ]);
 
             foreach ($request->options as $index => $optionText) {
@@ -89,6 +91,7 @@ class QuestionController extends Controller
         $request->validate([
             'question_text' => 'required|string',
             'difficulty_level' => 'required|integer|min:1|max:5',
+            'duration' => 'required|integer|min:1|max:3600',
             'options' => 'required|array|min:2',
             'options.*' => 'required|string',
             'correct_option' => 'required|integer|min:0'
@@ -99,6 +102,7 @@ class QuestionController extends Controller
                 'question_text' => $request->question_text,
                 'difficulty_level' => $request->difficulty_level,
                 'explanation' => $request->explanation,
+                'duration' => $request->duration,
             ]);
 
             // For simplicity, delete old options and recreate them

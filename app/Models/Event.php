@@ -14,12 +14,21 @@ class Event extends Model
         'started_at',
         'finished_at',
         'status',
-        'config',
+        'is_intro',
+        'quiz_started',
+        'current_question_seq',
+        'question_state',
+        'timer_started_at',
+        'timer_stopped_at',
         'created_by',
     ];
 
     protected $casts = [
-        'config' => 'array',
+        'is_intro' => 'boolean',
+        'quiz_started' => 'boolean',
+        'current_question_seq' => 'integer',
+        'timer_started_at' => 'integer',
+        'timer_stopped_at' => 'integer',
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
     ];

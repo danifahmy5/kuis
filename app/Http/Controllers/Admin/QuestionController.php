@@ -71,6 +71,7 @@ class QuestionController extends Controller
      */
     public function show(Question $question)
     {
+        
         return view('admin.questions.show', compact('question'));
     }
 

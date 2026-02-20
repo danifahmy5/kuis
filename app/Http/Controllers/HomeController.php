@@ -36,7 +36,7 @@ class HomeController extends Controller
     public function displayState(\App\Models\Event $event)
     {
         $event->load(['questions' => function ($query) {
-            $query->orderBy('seq');
+            $query->orderByPivot('seq');
         }, 'contestants']);
 
         $currentQuestion = null;

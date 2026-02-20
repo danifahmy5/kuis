@@ -149,7 +149,7 @@
                         </div>
                         <h5 class="fw-bold mb-3">Kelola Acara</h5>
                         <p class="text-muted small mb-4">Buat, pantau, dan selesaikan acara kuis yang sedang berlangsung.</p>
-                        <a href="{{ route('events.index') }}" class="btn btn-outline-primary w-100">Buka Manajemen Acara</a>
+                        <a href="{{ route('events.questions.index') }}" class="btn btn-outline-primary w-100">Buka Manajemen Acara</a>
                     </div>
                 </div>
             </div>
@@ -180,4 +180,3 @@
         </div>
     </div>
 @endsection
-

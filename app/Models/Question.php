@@ -23,6 +23,8 @@ class Question extends Model
 
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'event_questions');
+        return $this->belongsToMany(Event::class, 'event_questions')
+            ->withPivot('seq')
+            ->withTimestamps();
     }
 }

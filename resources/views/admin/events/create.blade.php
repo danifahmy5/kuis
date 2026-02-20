@@ -80,12 +80,44 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <label class="col-md-4 col-form-label text-md-end">{{ __('Soal') }}</label>
+                            <div class="col-md-6">
+                                <input type="text" id="question-search" class="form-control mb-2" placeholder="Cari soal...">
+                                <div class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                                    @forelse($questions as $question)
+                                        @php
+                                            $selectedQuestions = old('question_ids', []);
+                                        @endphp
+                                        <div class="d-flex align-items-start gap-2 mb-2 question-item" data-text="{{ strtolower($question->question_text) }}">
+                                            <div class="form-check mt-1">
+                                                <input class="form-check-input" type="checkbox" name="question_ids[]" value="{{ $question->id }}" id="question-{{ $question->id }}"
+                                                    {{ in_array($question->id, $selectedQuestions) ? 'checked' : '' }}>
+                                            </div>
+                                            <label class="form-check-label flex-grow-1" for="question-{{ $question->id }}">
+                                                <div class="fw-semibold">{{ Str::limit($question->question_text, 140) }}</div>
+                                                <small class="text-muted">Durasi: {{ $question->duration }} detik</small>
+                                            </label>
+                                            <input type="number" class="form-control form-control-sm" style="width: 90px;"
+                                                name="question_seq[{{ $question->id }}]" min="1" placeholder="Urutan"
+                                                value="{{ old('question_seq.' . $question->id) }}">
+                                        </div>
+                                    @empty
+                                        <div class="text-muted">Belum ada soal.</div>
+                                    @endforelse
+                                </div>
+                                <div class="form-text text-muted">Urutan akan diurutkan dan dinormalisasi menjadi 1..N.</div>
+                                @error('question_ids')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Simpan Acara') }}
                                 </button>
-                                <a href="{{ route('events.index') }}" class="btn btn-secondary">Batal</a>
+                                <a href="{{ route('events.questions.index') }}" class="btn btn-secondary">Batal</a>
                             </div>
                         </div>
                     </form>
@@ -105,6 +137,18 @@
             items.forEach(item => {
                 const name = item.getAttribute('data-name') || '';
                 item.style.display = name.includes(q) ? '' : 'none';
+            });
+        });
+    })();
+    (function () {
+        const search = document.getElementById('question-search');
+        const items = document.querySelectorAll('.question-item');
+        if (!search) return;
+        search.addEventListener('input', () => {
+            const q = search.value.trim().toLowerCase();
+            items.forEach(item => {
+                const text = item.getAttribute('data-text') || '';
+                item.style.display = text.includes(q) ? '' : 'none';
             });
         });
     })();

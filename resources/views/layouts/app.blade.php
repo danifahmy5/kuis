@@ -108,7 +108,7 @@
             @if (Auth::guard('admin')->check() || Auth::check())
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}" href="{{ route('events.index') }}">{{ __('Acara') }}</a>
+                        <a class="nav-link {{ request()->routeIs('events.questions.*') || request()->routeIs('events.*') ? 'active' : '' }}" href="{{ route('events.questions.index') }}">{{ __('Acara') }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('questions.*') ? 'active' : '' }}" href="{{ route('questions.index') }}">{{ __('Bank Soal') }}</a>

@@ -45,7 +45,9 @@ class Event extends Model
 
     public function questions()
     {
-        return $this->belongsToMany(Question::class, 'event_questions');
+        return $this->belongsToMany(Question::class, 'event_questions')
+            ->withPivot('seq')
+            ->withTimestamps();
     }
 
     public function answers()

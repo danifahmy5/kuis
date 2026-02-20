@@ -379,6 +379,57 @@
             color: #b8c6db;
         }
 
+        .sound-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(4, 10, 24, 0.72);
+            padding: 24px;
+        }
+
+        .sound-gate-card {
+            width: min(560px, 100%);
+            border-radius: 18px;
+            text-align: center;
+            padding: 32px 26px;
+            background: rgba(10, 46, 92, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+        }
+
+        .sound-gate-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.8rem, 3.8vw, 2.8rem);
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .sound-gate-text {
+            margin: 0;
+            font-size: 1.02rem;
+            color: #d6e1f3;
+        }
+
+        .sound-gate-btn {
+            margin-top: 22px;
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 24px;
+            font-weight: 700;
+            color: #0a2e5c;
+            background: var(--primary-gold);
+            transition: transform 0.15s ease;
+        }
+
+        .sound-gate-btn:hover {
+            transform: translateY(-1px);
+        }
+
         @media (min-width: 1366px) {
             .glass-card {
                 padding: 5rem 5.25rem;
@@ -459,6 +510,9 @@
             <span class="branding-text">Quiz Arena</span>
         </div>
         <div class="topbar-actions">
+            <button type="button" class="topbar-btn" id="sound-toggle">
+                <i class="fas fa-volume-mute me-1"></i>Unmute
+            </button>
             <button type="button" class="topbar-btn" id="leaderboard-toggle">
                 <i class="fas fa-trophy me-1"></i>Leaderboard
             </button>
@@ -489,6 +543,16 @@
         crafted by <strong>danifahmy5</strong>
     </div>
 
+    <div class="sound-gate" id="sound-gate">
+        <div class="sound-gate-card">
+            <div class="sound-gate-title">Nyalakan Suara</div>
+            <p class="sound-gate-text">Klik tombol di bawah untuk mengaktifkan audio kuis.</p>
+            <button type="button" class="sound-gate-btn" id="sound-gate-unmute">
+                <i class="fas fa-volume-up me-1"></i>Unmute
+            </button>
+        </div>
+    </div>
+
     <script>
         const eventId = {{ $event->id }};
         let lastState = null;
@@ -498,6 +562,23 @@
         const leaderboardList = document.getElementById('leaderboard-list');
         const leaderboardToggle = document.getElementById('leaderboard-toggle');
         const fullscreenToggle = document.getElementById('fullscreen-toggle');
+        const soundToggle = document.getElementById('sound-toggle');
+        const soundGate = document.getElementById('sound-gate');
+        const soundGateUnmute = document.getElementById('sound-gate-unmute');
+        const heartbeatEarlySrc = "{{ asset('heartbeat-01.mp3') }}";
+        const heartbeatLateSrc = "{{ asset('heartbeat-02.mp3') }}";
+        const buzzerSrc = "{{ asset('buzzer.mp3') }}";
+        const audioTracks = {
+            early: new Audio(heartbeatEarlySrc),
+            late: new Audio(heartbeatLateSrc),
+        };
+        const buzzerAudio = new Audio(buzzerSrc);
+        let currentAudioKey = null;
+        let audioEnabled = false;
+        let audioMuted = true;
+        let lastAudioContext = { shouldPlay: false, key: null };
+        let currentQuestionKey = null;
+        let buzzerPlayedForQuestion = false;
 
         async function fetchState() {
             try {
@@ -516,6 +597,7 @@
             // Check if intro
             if (data.event.is_intro) {
                 clearCountdown();
+                stopAudio(true);
                 app.innerHTML = `
                     <div class="intro-title">${data.event.title}</div>
                     <div class="intro-desc mt-4">${data.event.title}</div>
@@ -527,6 +609,7 @@
             // Check if quiz started
             if (!data.event.quiz_started) {
                 const startedAt = data.event.started_at ? new Date(data.event.started_at) : null;
+                stopAudio(true);
                 app.innerHTML = `
                     <div class="intro-title">${data.event.title}</div>
                     <div class="intro-desc mt-4">Kuis belum dimulai</div>
@@ -555,8 +638,15 @@
 
             if (!question) {
                 clearCountdown();
+                stopAudio(true);
+                resetBuzzerTracking(null);
                 app.innerHTML = `<h1>Menunggu soal...</h1>`;
                 return;
+            }
+
+            const nextQuestionKey = question.id ?? data.event.current_question_seq;
+            if (nextQuestionKey !== currentQuestionKey) {
+                resetBuzzerTracking(nextQuestionKey);
             }
 
             let optionsHtml = '';
@@ -588,6 +678,7 @@
                 startLocalTimer(data.event.timer_started_at, data.event.timer_stopped_at, duration);
             } else if (state === 'revealed' || state === 'blurred') {
                 clearInterval(timerInterval);
+                stopAudio(true);
                 const timerDisplay = document.getElementById('timer-display');
                 if (timerDisplay) {
                     if (data.event.timer_stopped_at && data.event.timer_started_at) {
@@ -640,6 +731,8 @@
                 if (remaining <= 0 || stoppedAt) {
                     clearInterval(timerInterval);
                 }
+
+                updateAudioForProgress(elapsed, remaining, duration, Boolean(stoppedAt));
             };
 
             tick();
@@ -702,6 +795,134 @@
             }
         }
 
+        function setupAudio() {
+            Object.values(audioTracks).forEach(track => {
+                track.loop = true;
+                track.preload = 'auto';
+            });
+            buzzerAudio.preload = 'auto';
+        }
+
+        function updateSoundButton() {
+            if (!soundToggle) return;
+            if (audioMuted) {
+                soundToggle.innerHTML = '<i class="fas fa-volume-mute me-1"></i>Unmute';
+            } else {
+                soundToggle.innerHTML = '<i class="fas fa-volume-up me-1"></i>Mute';
+            }
+        }
+
+        function closeSoundGate() {
+            if (!soundGate) return;
+            soundGate.classList.add('d-none');
+        }
+
+        function openSoundGate() {
+            if (!soundGate) return;
+            soundGate.classList.remove('d-none');
+        }
+
+        function setSoundMuted(nextMuted) {
+            if (!audioEnabled) {
+                audioEnabled = true;
+            }
+
+            audioMuted = nextMuted;
+            updateSoundButton();
+
+            if (audioMuted) {
+                pauseAllAudio(false);
+            } else if (lastAudioContext.shouldPlay && lastAudioContext.key) {
+                setActiveAudio(lastAudioContext.key, false);
+            }
+        }
+
+        function canPlayAudio() {
+            return audioEnabled && !audioMuted;
+        }
+
+        function pauseAllAudio(reset = false) {
+            Object.values(audioTracks).forEach(track => {
+                track.pause();
+                if (reset) {
+                    track.currentTime = 0;
+                }
+            });
+            if (reset) {
+                currentAudioKey = null;
+            }
+        }
+
+        function setActiveAudio(key, resetOnSwitch = true) {
+            if (currentAudioKey === key) {
+                if (canPlayAudio()) {
+                    audioTracks[key].play().catch(() => {});
+                }
+                return;
+            }
+
+            if (resetOnSwitch) {
+                pauseAllAudio(true);
+            } else {
+                pauseAllAudio(false);
+            }
+
+            currentAudioKey = key;
+            if (canPlayAudio()) {
+                audioTracks[key].play().catch(() => {});
+            }
+        }
+
+        function stopAudio(reset = true) {
+            lastAudioContext = { shouldPlay: false, key: null };
+            pauseAllAudio(reset);
+        }
+
+        function resetBuzzerTracking(questionKey) {
+            currentQuestionKey = questionKey;
+            buzzerPlayedForQuestion = false;
+        }
+
+        function playBuzzerOnce() {
+            if (buzzerPlayedForQuestion || !canPlayAudio()) return;
+            buzzerPlayedForQuestion = true;
+            buzzerAudio.currentTime = 0;
+            buzzerAudio.play().catch(() => {});
+        }
+
+        function updateAudioForProgress(elapsed, remaining, duration, stopped) {
+            if (duration <= 0) {
+                lastAudioContext = { shouldPlay: false, key: null };
+                pauseAllAudio(true);
+                return;
+            }
+
+            if (remaining <= 0) {
+                lastAudioContext = { shouldPlay: false, key: null };
+                pauseAllAudio(true);
+                if (!stopped) {
+                    playBuzzerOnce();
+                }
+                return;
+            }
+
+            if (stopped) {
+                lastAudioContext = { shouldPlay: false, key: null };
+                pauseAllAudio(true);
+                return;
+            }
+
+            const progress = Math.min(1, Math.max(0, elapsed / duration));
+            const nextKey = progress < 0.7 ? 'early' : 'late';
+            lastAudioContext = { shouldPlay: true, key: nextKey };
+
+            if (!canPlayAudio()) {
+                return;
+            }
+
+            setActiveAudio(nextKey, nextKey !== currentAudioKey);
+        }
+
         if (leaderboardToggle) {
             leaderboardToggle.addEventListener('click', () => {
                 leaderboardPanel.classList.toggle('d-none');
@@ -724,8 +945,24 @@
             });
         }
 
+        if (soundToggle) {
+            soundToggle.addEventListener('click', () => {
+                setSoundMuted(!audioMuted);
+            });
+        }
+
+        if (soundGateUnmute) {
+            soundGateUnmute.addEventListener('click', () => {
+                setSoundMuted(false);
+                closeSoundGate();
+            });
+        }
+
         document.addEventListener('fullscreenchange', updateFullscreenButton);
         updateFullscreenButton();
+        setupAudio();
+        updateSoundButton();
+        openSoundGate();
 
         // Poll every 2 seconds
         setInterval(fetchState, 2000);

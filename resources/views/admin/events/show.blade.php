@@ -98,15 +98,19 @@
                                     </a>
                                 </div>
 
+                                @php
+                                    $showInfoPanel = !$event->quiz_started;
+                                @endphp
+
                                 <div class="d-flex justify-content-end mt-2">
                                     <button type="button" class="btn btn-outline-secondary btn-sm"
-                                        data-bs-toggle="collapse" data-bs-target="#eventMetaPanel" aria-expanded="false"
+                                        data-bs-toggle="collapse" data-bs-target="#eventMetaPanel" aria-expanded="{{ $showInfoPanel ? 'true' : 'false' }}"
                                         aria-controls="eventMetaPanel">
                                         <i class="bi bi-layout-sidebar-inset me-1"></i>Toggle Info
                                     </button>
                                 </div>
 
-                                <div id="eventMetaPanel" class="collapse">
+                                <div id="eventMetaPanel" class="collapse {{ $showInfoPanel ? 'show' : '' }}">
                                     <hr class="my-4">
 
                                     <div class="row g-4">

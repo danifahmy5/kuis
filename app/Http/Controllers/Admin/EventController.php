@@ -548,7 +548,7 @@ class EventController extends Controller
             'is_intro' => false,
             'quiz_started' => true,
             'current_question_seq' => 1,
-            'question_state' => 'blurred',
+            'question_state' => 'hidden',
             'timer_started_at' => null,
             'timer_stopped_at' => null,
         ]);
@@ -563,7 +563,7 @@ class EventController extends Controller
         if ($event->current_question_seq && $event->current_question_seq < $maxSeq) {
             $event->update([
                 'current_question_seq' => $event->current_question_seq + 1,
-                'question_state' => 'blurred',
+                'question_state' => 'hidden',
                 'timer_started_at' => null,
                 'timer_stopped_at' => null,
             ]);
@@ -577,7 +577,7 @@ class EventController extends Controller
         if ($event->current_question_seq && $event->current_question_seq > 1) {
             $event->update([
                 'current_question_seq' => $event->current_question_seq - 1,
-                'question_state' => 'blurred',
+                'question_state' => 'hidden',
                 'timer_started_at' => null,
                 'timer_stopped_at' => null,
             ]);
@@ -588,9 +588,36 @@ class EventController extends Controller
 
     public function unblurQuestion(Event $event)
     {
+        $sequence = [
+            'hidden' => 'question',
+            'question' => 'option_a',
+            'option_a' => 'option_b',
+            'option_b' => 'option_c',
+            'option_c' => 'option_d',
+            'option_d' => 'revealed',
+            'blurred' => 'question',
+            'unblurred' => 'option_a',
+        ];
+
+        $current = $event->question_state ?? 'hidden';
+        $next = $sequence[$current] ?? $current;
+
+        if ($next !== $current) {
+            $event->update([
+                'question_state' => $next,
+                'timer_started_at' => null,
+                'timer_stopped_at' => null,
+            ]);
+        }
+
+        return back();
+    }
+
+    public function resetQuestionState(Event $event)
+    {
         $event->update([
-            'question_state' => 'unblurred',
-            'timer_started_at' => now()->timestamp,
+            'question_state' => 'hidden',
+            'timer_started_at' => null,
             'timer_stopped_at' => null,
         ]);
 

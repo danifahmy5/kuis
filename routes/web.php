@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::post('events/{event}/next-question', [App\Http\Controllers\Admin\EventController::class, 'nextQuestion'])->name('events.next-question');
     Route::post('events/{event}/prev-question', [App\Http\Controllers\Admin\EventController::class, 'prevQuestion'])->name('events.prev-question');
     Route::post('events/{event}/unblur-question', [App\Http\Controllers\Admin\EventController::class, 'unblurQuestion'])->name('events.unblur-question');
+    Route::post('events/{event}/reset-question', [App\Http\Controllers\Admin\EventController::class, 'resetQuestionState'])->name('events.reset-question');
     Route::post('events/{event}/reveal-answer', [App\Http\Controllers\Admin\EventController::class, 'revealAnswer'])->name('events.reveal-answer');
     Route::post('events/{event}/award-points', [App\Http\Controllers\Admin\EventController::class, 'awardPoints'])->name('events.award-points');
     Route::patch('events/{event}/award-points/{eventAnswer}', [App\Http\Controllers\Admin\EventController::class, 'updateAwardedPoints'])->name('events.award-points.update');

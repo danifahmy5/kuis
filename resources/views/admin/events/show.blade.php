@@ -252,24 +252,39 @@
                                                 </h2>
 
                                                 <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-                                                    @if ($event->question_state == 'blurred')
+                                                    @php
+                                                        $nextLabel = match ($event->question_state) {
+                                                            null, 'hidden', 'blurred' => 'Tampilkan Soal',
+                                                            'question', 'unblurred' => 'Tampilkan Jawaban A',
+                                                            'option_a' => 'Tampilkan Jawaban B',
+                                                            'option_b' => 'Tampilkan Jawaban C',
+                                                            'option_c' => 'Tampilkan Jawaban D',
+                                                            default => null,
+                                                        };
+                                                    @endphp
+
+                                                    @if ($event->question_state !== 'revealed' && $nextLabel)
                                                         <form action="{{ route('events.unblur-question', $event->id) }}"
                                                             method="POST">
                                                             @csrf
                                                             <button type="submit"
                                                                 class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm py-3 transition-all">
-                                                                <i class="bi bi-eye me-2"></i>Tampilkan Soal
+                                                                <i class="bi bi-eye me-2"></i>{{ $nextLabel }}
                                                             </button>
                                                         </form>
-                                                    @elseif($event->question_state == 'unblurred')
-                                                        <form action="{{ route('events.stop-timer', $event->id) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="btn btn-danger btn-lg rounded-pill px-4 py-3 shadow-sm">
-                                                                <i class="bi bi-stop-circle me-2"></i>Stop Waktu
-                                                            </button>
-                                                        </form>
+                                                    @endif
+
+                                                    <form action="{{ route('events.reset-question', $event->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="btn btn-outline-secondary btn-lg rounded-pill px-4 py-3 shadow-sm"
+                                                            {{ in_array($event->question_state, [null, 'hidden', 'blurred'], true) ? 'disabled' : '' }}>
+                                                            <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                                                        </button>
+                                                    </form>
+
+                                                    @if ($event->question_state === 'option_d')
                                                         <form action="{{ route('events.reveal-answer', $event->id) }}"
                                                             method="POST">
                                                             @csrf

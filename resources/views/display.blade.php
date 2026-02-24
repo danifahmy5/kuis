@@ -607,11 +607,13 @@
         const soundGateUnmute = document.getElementById('sound-gate-unmute');
         const heartbeatLateSrc = "{{ asset('heartbeat-02.mp3') }}";
         const wrongAnswerSrc = "{{ asset('wrong-answer.mp3') }}";
+        const showAnswerSrc = "{{ asset('show-answer.mp3') }}";
         
         const audioTracks = {
             late: new Audio(heartbeatLateSrc),
         };
         const wrongAnswerAudio = new Audio(wrongAnswerSrc);
+        const showAnswerAudio = new Audio(showAnswerSrc);
         let currentAudioKey = null;
         let audioEnabled = false;
         let audioMuted = true;
@@ -621,6 +623,7 @@
         let lastWrongQuestionKey = null;
         let lastLeaderboardOrder = new Map();
         let wrongFeedbackInitialized = false;
+        let lastQuestionState = null;
 
         async function fetchState() {
             try {
@@ -676,7 +679,7 @@
 
             // Question Active
             const question = data.current_question;
-            const state = data.event.question_state; // blurred, unblurred, revealed
+            const state = normalizeQuestionState(data.event.question_state);
 
             if (!question) {
                 clearCountdown();
@@ -695,32 +698,37 @@
             }
 
             let optionsHtml = '';
-            if (question.options) {
-                question.options.forEach(opt => {
+            const visibleCount = getVisibleOptionCount(state);
+            if (question.options && visibleCount > 0) {
+                question.options.slice(0, visibleCount).forEach(opt => {
                     const isCorrectClass = (state === 'revealed' && opt.is_correct) ? 'correct' : '';
                     optionsHtml += `<div class="option-item ${isCorrectClass}">${opt.label}. ${opt.option_text}</div>`;
                 });
             }
 
-            const blurClass = (state === 'blurred') ? 'blurred' : '';
-            
             app.innerHTML = `
                 <div class="mb-4">Soal Ke-${data.event.current_question_seq}</div>
-                <div class="${blurClass}">
+                ${state === 'hidden' ? '<div class="intro-desc">Menunggu host menampilkan soal...</div>' : `
                     <div class="question-text">${question.question_text}</div>
                     <div class="options-container">
                         ${optionsHtml}
                     </div>
-                </div>
+                `}
             `;
             clearCountdown();
 
             handleWrongFeedback(data.wrong_answer, nextQuestionKey);
 
-            if (state === 'unblurred') {
+            if (state === 'revealed' && lastQuestionState !== 'revealed') {
+                playShowAnswer();
+            }
+
+            lastQuestionState = state;
+
+            if (['question', 'option_a', 'option_b', 'option_c', 'option_d'].includes(state)) {
                 setActiveAudio('late', true);
                 lastAudioContext = { shouldPlay: true, key: 'late' };
-            } else if (state === 'revealed' || state === 'blurred') {
+            } else if (state === 'revealed' || state === 'hidden' || state === null) {
                 stopAudio(true);
             }
         }
@@ -753,6 +761,28 @@
             lastLeaderboardOrder = new Map(
                 leaderboard.map((item, index) => [item.id, index])
             );
+        }
+
+        function getVisibleOptionCount(state) {
+            switch (state) {
+                case 'option_a':
+                    return 1;
+                case 'option_b':
+                    return 2;
+                case 'option_c':
+                    return 3;
+                case 'option_d':
+                case 'revealed':
+                    return 4;
+                default:
+                    return 0;
+            }
+        }
+
+        function normalizeQuestionState(state) {
+            if (state === 'blurred' || state === null) return 'hidden';
+            if (state === 'unblurred') return 'question';
+            return state;
         }
 
         function clearCountdown() {
@@ -815,6 +845,7 @@
                 track.preload = 'auto';
             });
             wrongAnswerAudio.preload = 'auto';
+            showAnswerAudio.preload = 'auto';
         }
 
         function updateSoundButton() {
@@ -847,6 +878,7 @@
                 track.muted = audioMuted;
             });
             wrongAnswerAudio.muted = audioMuted;
+            showAnswerAudio.muted = audioMuted;
 
             if (audioMuted) {
                 pauseAllAudio(false);
@@ -949,6 +981,12 @@
             }, effectDurationMs);
         }
 
+        function playShowAnswer() {
+            if (!canPlayAudio()) return;
+            showAnswerAudio.currentTime = 0;
+            showAnswerAudio.play().catch(() => {});
+        }
+
         if (fullscreenToggle) {
             fullscreenToggle.addEventListener('click', async () => {
                 try {
@@ -985,7 +1023,7 @@
         openSoundGate();
 
         // Poll every 2 seconds
-        setInterval(fetchState, 2000);
+        setInterval(fetchState, 1000);
         fetchState();
     </script>
 </body>

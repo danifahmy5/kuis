@@ -97,7 +97,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <p class="text-primary mb-1 fw-bold text-uppercase small">Total Acara</p>
-                                <h2 class="m-0 fw-bold text-dark">10</h2>
+                                <h2 class="m-0 fw-bold text-dark">{{ number_format($totalEvents) }}</h2>
                             </div>
                             <div class="report-main-icon shadow-sm">
                                 <i class="fas fa-calendar-alt text-white"></i>
@@ -112,7 +112,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <p class="text-success mb-1 fw-bold text-uppercase small">Total Soal</p>
-                                <h2 class="m-0 fw-bold text-dark">150</h2>
+                                <h2 class="m-0 fw-bold text-dark">{{ number_format($totalQuestions) }}</h2>
                             </div>
                             <div class="report-main-icon shadow-sm">
                                 <i class="fas fa-book text-white"></i>
@@ -127,7 +127,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <p class="text-danger mb-1 fw-bold text-uppercase small">Total Peserta</p>
-                                <h2 class="m-0 fw-bold text-dark">340</h2>
+                                <h2 class="m-0 fw-bold text-dark">{{ number_format($totalContestants) }}</h2>
                             </div>
                             <div class="report-main-icon shadow-sm">
                                 <i class="fas fa-users text-white"></i>

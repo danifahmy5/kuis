@@ -66,6 +66,10 @@
                     $showControlPanel = $event->status == 'running' && $event->quiz_started;
                 @endphp
 
+                <a href="{{ route('display', $event->id) }}" target="_blank"
+                    class="btn btn-light mb-2 bg-white border shadow-sm rounded-pill px-4 text-secondary hover-lift">
+                    <i class="bi bi-box-arrow-up-right me-2"></i>Layar Audience
+                </a>
                 <div class="row g-4 align-items-start">
                     <div class="{{ $showControlPanel ? 'col-xl-12' : 'col-12' }}">
                         <!-- Header Card -->
@@ -88,15 +92,16 @@
                                                 {{ $event->created_at->format('d M Y, H:i') }}</span>
                                         </div>
                                     </div>
-                                    <a href="{{ route('events.questions.index') }}" class="btn btn-outline-secondary btn-sm">
+                                    <a href="{{ route('events.questions.index') }}"
+                                        class="btn btn-outline-secondary btn-sm">
                                         &larr; Kembali
                                     </a>
                                 </div>
 
                                 <div class="d-flex justify-content-end mt-2">
                                     <button type="button" class="btn btn-outline-secondary btn-sm"
-                                        data-bs-toggle="collapse" data-bs-target="#eventMetaPanel"
-                                        aria-expanded="false" aria-controls="eventMetaPanel">
+                                        data-bs-toggle="collapse" data-bs-target="#eventMetaPanel" aria-expanded="false"
+                                        aria-controls="eventMetaPanel">
                                         <i class="bi bi-layout-sidebar-inset me-1"></i>Toggle Info
                                     </button>
                                 </div>
@@ -106,11 +111,13 @@
 
                                     <div class="row g-4">
                                         <div class="col-md-3">
-                                            <h6 class="text-muted text-uppercase small fw-bold mb-2">Informasi Penyelenggara</h6>
+                                            <h6 class="text-muted text-uppercase small fw-bold mb-2">Informasi Penyelenggara
+                                            </h6>
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-light rounded-circle p-2 me-3 text-center"
                                                     style="width: 45px; height: 45px;">
-                                                    <span class="fw-bold text-primary">{{ substr($event->creator->name, 0, 1) }}</span>
+                                                    <span
+                                                        class="fw-bold text-primary">{{ substr($event->creator->name, 0, 1) }}</span>
                                                 </div>
                                                 <div>
                                                     <p class="mb-0 fw-bold text-dark">{{ $event->creator->name }}</p>
@@ -126,7 +133,8 @@
                                                 <div class="d-flex flex-wrap gap-2">
                                                     @foreach ($event->contestants as $contestant)
                                                         <span class="badge bg-light text-dark border border-light-subtle">
-                                                            {{ $contestant->name }} ({{ (int) ($contestantPoints[$contestant->id] ?? 0) }}
+                                                            {{ $contestant->name }}
+                                                            ({{ (int) ($contestantPoints[$contestant->id] ?? 0) }}
                                                             poin)
                                                         </span>
                                                     @endforeach
@@ -140,8 +148,8 @@
                                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                             <div>
                                                 @if ($event->status == 'draft')
-                                                    <form action="{{ route('events.start-intro', $event->id) }}" method="POST"
-                                                        class="d-inline">
+                                                    <form action="{{ route('events.start-intro', $event->id) }}"
+                                                        method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="submit" class="btn btn-primary">
                                                             <i class="bi bi-play-fill"></i> Mulai Acara (Intro)
@@ -150,8 +158,8 @@
                                                 @endif
 
                                                 @if ($event->status == 'running' && $event->is_intro)
-                                                    <form action="{{ route('events.start-quiz', $event->id) }}" method="POST"
-                                                        class="d-inline">
+                                                    <form action="{{ route('events.start-quiz', $event->id) }}"
+                                                        method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="submit" class="btn btn-success">
                                                             <i class="bi bi-lightning-fill"></i> Mulai Kuis
@@ -171,7 +179,8 @@
                                                 </a>
 
                                                 <form action="{{ route('events.destroy', $event->id) }}" method="POST"
-                                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus acara ini?')">
+                                                    class="d-inline"
+                                                    onsubmit="return confirm('Yakin ingin menghapus acara ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
@@ -194,10 +203,7 @@
                                     </h5>
                                     <small class="text-muted">Event ID: #{{ $event->id }}</small>
                                 </div>
-                                <a href="{{ route('display', $event->id) }}" target="_blank"
-                                    class="btn btn-light bg-white border shadow-sm rounded-pill px-4 text-secondary hover-lift">
-                                    <i class="bi bi-box-arrow-up-right me-2"></i>Layar Audience
-                                </a>
+
                             </div>
 
                             <div class="row g-4">
@@ -234,7 +240,8 @@
                                         <div class="card-body p-md-5 text-center">
                                             @if ($currentQuestion)
                                                 <div>
-                                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">
+                                                    <span
+                                                        class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">
                                                         <i class="bi bi-clock me-1 text-danger"></i> Durasi:
                                                         <strong>{{ $currentQuestion->duration }}s</strong>
                                                     </span>
@@ -255,7 +262,8 @@
                                                             </button>
                                                         </form>
                                                     @elseif($event->question_state == 'unblurred')
-                                                        <form action="{{ route('events.stop-timer', $event->id) }}" method="POST">
+                                                        <form action="{{ route('events.stop-timer', $event->id) }}"
+                                                            method="POST">
                                                             @csrf
                                                             <button type="submit"
                                                                 class="btn btn-danger btn-lg rounded-pill px-4 py-3 shadow-sm">
@@ -304,20 +312,23 @@
                                         </div>
                                         <div class="card-body">
                                             @if ($event->question_state == 'revealed')
-                                                <form action="{{ route('events.award-points', $event->id) }}" method="POST">
+                                                <form action="{{ route('events.award-points', $event->id) }}"
+                                                    method="POST">
                                                     @csrf
                                                     <div class="card border bg-light mb-3">
-                                                        <div class="card-body p-0" style="max-height: 220px; overflow-y: auto;">
+                                                        <div class="card-body p-0"
+                                                            style="max-height: 220px; overflow-y: auto;">
                                                             <ul class="list-group list-group-flush text-start">
                                                                 @foreach ($event->contestants as $contestant)
                                                                     <li class="list-group-item bg-transparent">
                                                                         <div class="form-check custom-checkbox">
-                                                                            <input class="form-check-input" type="checkbox"
-                                                                                name="contestant_ids[]"
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox" name="contestant_ids[]"
                                                                                 value="{{ $contestant->id }}"
                                                                                 id="c-{{ $contestant->id }}"
                                                                                 {{ in_array($contestant->id, old('contestant_ids', [])) ? 'checked' : '' }}>
-                                                                            <label class="form-check-label w-100 stretched-link"
+                                                                            <label
+                                                                                class="form-check-label w-100 stretched-link"
                                                                                 for="c-{{ $contestant->id }}">
                                                                                 {{ $contestant->name }}
                                                                                 <span class="text-muted small">(total:
@@ -352,7 +363,8 @@
 
                                     <div class="card border-0 shadow-sm rounded-4">
                                         <div class="card-header bg-white">
-                                            <h6 class="fw-bold text-muted text-uppercase mb-0 ls-1">Koreksi Poin Soal Ini</h6>
+                                            <h6 class="fw-bold text-muted text-uppercase mb-0 ls-1">Koreksi Poin Soal Ini
+                                            </h6>
                                         </div>
                                         <div class="card-body p-0">
                                             @if ($event->question_state == 'revealed')
@@ -372,7 +384,8 @@
                                                             <tbody>
                                                                 @foreach ($currentQuestionAnswers as $answer)
                                                                     <tr>
-                                                                        <td class="px-3">{{ $answer->contestant->name ?? '-' }}</td>
+                                                                        <td class="px-3">
+                                                                            {{ $answer->contestant->name ?? '-' }}</td>
                                                                         <td class="px-3">
                                                                             <form
                                                                                 action="{{ route('events.award-points.update', [$event->id, $answer->id]) }}"
@@ -381,7 +394,8 @@
                                                                                 @method('PATCH')
                                                                                 <input type="number" name="points"
                                                                                     class="form-control form-control-sm"
-                                                                                    value="{{ $answer->points_awarded }}" required>
+                                                                                    value="{{ $answer->points_awarded }}"
+                                                                                    required>
                                                                                 <button type="submit"
                                                                                     class="btn btn-sm btn-outline-primary">Simpan</button>
                                                                             </form>

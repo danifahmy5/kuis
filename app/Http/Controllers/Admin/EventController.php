@@ -12,8 +12,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use OpenSpout\Common\Entity\Row;
 use OpenSpout\Reader\XLSX\Reader;
-use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
+use OpenSpout\Writer\XLSX\Writer;
 
 class EventController extends Controller
 {
@@ -154,10 +155,10 @@ class EventController extends Controller
         $fileName = "template-soal-acara-{$event->id}.xlsx";
         $filePath = $tempDir . DIRECTORY_SEPARATOR . $fileName;
 
-        $writer = WriterEntityFactory::createXLSXWriter();
+        $writer = new Writer();
         $writer->openToFile($filePath);
-        $writer->addRow(WriterEntityFactory::createRowFromArray($headers));
-        $writer->addRow(WriterEntityFactory::createRowFromArray($example));
+        $writer->addRow(Row::fromValues($headers));
+        $writer->addRow(Row::fromValues($example));
         $writer->close();
 
         return response()->download($filePath, $fileName)->deleteFileAfterSend(true);
@@ -198,10 +199,9 @@ class EventController extends Controller
         foreach ($reader->getSheetIterator() as $sheet) {
             foreach ($sheet->getRowIterator() as $row) {
                 $rowNumber++;
-                $values = [];
-                foreach ($row->getCells() as $cell) {
-                    $values[] = is_string($cell->getValue()) ? trim($cell->getValue()) : $cell->getValue();
-                }
+                $values = array_map(static function ($value) {
+                    return is_string($value) ? trim($value) : $value;
+                }, $row->toArray());
 
                 $isEmptyRow = count(array_filter($values, function ($value) {
                     return $value !== null && $value !== '';

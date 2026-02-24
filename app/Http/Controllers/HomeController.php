@@ -65,10 +65,26 @@ class HomeController extends Controller
             ->sortByDesc('total_points')
             ->values();
 
+        $latestWrongAnswer = null;
+        if ($currentQuestion) {
+            $latestWrongAnswer = EventAnswer::query()
+                ->where('event_id', $event->id)
+                ->where('question_id', $currentQuestion->id)
+                ->where('is_correct', false)
+                ->orderByDesc('marked_at')
+                ->first();
+        }
+
         return response()->json([
             'event' => $event,
             'current_question' => $currentQuestion,
             'leaderboard' => $leaderboard,
+            'wrong_answer' => $latestWrongAnswer ? [
+                'contestant_id' => $latestWrongAnswer->contestant_id,
+                'marked_at' => $latestWrongAnswer->marked_at
+                    ? $latestWrongAnswer->marked_at->timestamp
+                    : null,
+            ] : null,
         ]);
     }
 }

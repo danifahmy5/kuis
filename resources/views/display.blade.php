@@ -75,7 +75,15 @@
             justify-content: center;
             position: relative;
             z-index: 10;
-            padding: 24px;
+            padding: 110px 24px 24px;
+        }
+
+        .display-layout {
+            width: min(1400px, 96vw);
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+            gap: 24px;
+            align-items: start;
         }
 
         .display-topbar {
@@ -142,13 +150,9 @@
         }
 
         .leaderboard-panel {
-            position: fixed;
-            top: 84px;
-            right: 16px;
-            width: min(440px, calc(100vw - 32px));
-            max-height: calc(100vh - 110px);
+            width: 100%;
+            max-height: calc(100vh - 140px);
             overflow-y: auto;
-            z-index: 35;
             background: rgba(7, 20, 42, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 18px;
@@ -173,6 +177,7 @@
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.06);
             margin-bottom: 8px;
+            transition: transform 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
         }
 
         .rank-chip {
@@ -200,6 +205,12 @@
             color: #d1d8e3;
             text-align: center;
             margin: 8px 0 2px;
+        }
+
+        .leaderboard-item.moved {
+            animation: leaderboardMove 0.6s ease;
+            background: rgba(255, 215, 0, 0.12);
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.2);
         }
 
         .d-none {
@@ -241,9 +252,9 @@
             border-radius: 24px;
             padding: 4.5rem;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            max-width: 1200px;
-            width: 94%;
+            width: 100%;
             text-align: center;
+            position: relative;
             animation: slideUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -328,15 +339,6 @@
             user-select: none;
         }
 
-        .timer {
-            font-size: clamp(4.8rem, 9vw, 8rem);
-            font-weight: 800;
-            margin: 22px 0 26px;
-            color: var(--primary-gold);
-            text-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
-            line-height: 1;
-        }
-
         .question-text {
             font-size: clamp(2.2rem, 4.2vw, 3.8rem);
             margin-bottom: 36px;
@@ -366,6 +368,25 @@
         .option-item.correct {
             background: #198754;
             color: #fff;
+        }
+
+        .wrong-feedback {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .wrong-feedback::before {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 85, 85, 0.45);
+            box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.3);
+            animation: redPulse var(--wrong-feedback-duration, 1.6s) ease-in-out 1;
+            pointer-events: none;
+        }
+
+        .wrong-feedback .option-item {
+            animation: redTint var(--wrong-feedback-duration, 1.6s) ease-in-out 1;
         }
 
         .intro-title {
@@ -461,11 +482,37 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes leaderboardMove {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes redPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.2); }
+            50% { box-shadow: 0 0 40px 8px rgba(255, 85, 85, 0.45); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.2); }
+        }
+
+        @keyframes redTint {
+            0% { box-shadow: 0 0 0 rgba(255, 85, 85, 0); }
+            50% { box-shadow: 0 0 30px rgba(255, 85, 85, 0.45); }
+            100% { box-shadow: 0 0 0 rgba(255, 85, 85, 0); }
+        }
+
         @media (max-width: 768px) {
             .event-title { font-size: 2.5rem; }
             .glass-card { padding: 2rem; width: 95%; }
             .options-container { grid-template-columns: 1fr; }
-            .timer { font-size: 3rem; }
             .question-text { font-size: 1.6rem; }
             .intro-title { font-size: 2.5rem; }
             .intro-desc { font-size: 1.4rem; }
@@ -483,11 +530,8 @@
                 padding: 8px 12px;
                 font-size: 0.82rem;
             }
-            .leaderboard-panel {
-                top: 70px;
-                right: 12px;
-                left: 12px;
-                width: auto;
+            .display-layout {
+                grid-template-columns: 1fr;
             }
             .display-footer {
                 right: 12px;
@@ -513,28 +557,26 @@
             <button type="button" class="topbar-btn" id="sound-toggle">
                 <i class="fas fa-volume-mute me-1"></i>Unmute
             </button>
-            <button type="button" class="topbar-btn" id="leaderboard-toggle">
-                <i class="fas fa-trophy me-1"></i>Leaderboard
-            </button>
             <button type="button" class="topbar-btn" id="fullscreen-toggle">
                 <i class="fas fa-expand me-1"></i>Fullscreen
             </button>
         </div>
     </div>
 
-    <div class="leaderboard-panel d-none" id="leaderboard-panel">
-        <h5><i class="fas fa-ranking-star me-2"></i>Leaderboard</h5>
-        <div id="leaderboard-list"></div>
-    </div>
-
     <div class="main-content">
-        <div class="glass-card" id="app">
-            {{-- Content will be updated by JavaScript --}}
-            <div class="status-badge">
-                <div class="status-dot"></div>
-                Live Preview
+        <div class="display-layout">
+            <div class="glass-card" id="app">
+                {{-- Content will be updated by JavaScript --}}
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    Live Preview
+                </div>
+                <h1 class="event-title">Loading...</h1>
             </div>
-            <h1 class="event-title">Loading...</h1>
+            <div class="leaderboard-panel" id="leaderboard-panel">
+                <h5><i class="fas fa-ranking-star me-2"></i>Leaderboard</h5>
+                <div id="leaderboard-list"></div>
+            </div>
         </div>
     </div>
 
@@ -556,29 +598,29 @@
     <script>
         const eventId = {{ $event->id }};
         let lastState = null;
-        let timerInterval = null;
         let countdownInterval = null;
         const leaderboardPanel = document.getElementById('leaderboard-panel');
         const leaderboardList = document.getElementById('leaderboard-list');
-        const leaderboardToggle = document.getElementById('leaderboard-toggle');
         const fullscreenToggle = document.getElementById('fullscreen-toggle');
         const soundToggle = document.getElementById('sound-toggle');
         const soundGate = document.getElementById('sound-gate');
         const soundGateUnmute = document.getElementById('sound-gate-unmute');
-        const heartbeatEarlySrc = "{{ asset('heartbeat-01.mp3') }}";
         const heartbeatLateSrc = "{{ asset('heartbeat-02.mp3') }}";
-        const buzzerSrc = "{{ asset('buzzer.mp3') }}";
+        const wrongAnswerSrc = "{{ asset('wrong-answer.mp3') }}";
+        
         const audioTracks = {
-            early: new Audio(heartbeatEarlySrc),
             late: new Audio(heartbeatLateSrc),
         };
-        const buzzerAudio = new Audio(buzzerSrc);
+        const wrongAnswerAudio = new Audio(wrongAnswerSrc);
         let currentAudioKey = null;
         let audioEnabled = false;
         let audioMuted = true;
         let lastAudioContext = { shouldPlay: false, key: null };
         let currentQuestionKey = null;
-        let buzzerPlayedForQuestion = false;
+        let lastWrongMarkAt = null;
+        let lastWrongQuestionKey = null;
+        let lastLeaderboardOrder = new Map();
+        let wrongFeedbackInitialized = false;
 
         async function fetchState() {
             try {
@@ -647,6 +689,9 @@
             const nextQuestionKey = question.id ?? data.event.current_question_seq;
             if (nextQuestionKey !== currentQuestionKey) {
                 resetBuzzerTracking(nextQuestionKey);
+                lastWrongQuestionKey = nextQuestionKey;
+                lastWrongMarkAt = data.wrong_answer?.marked_at || null;
+                wrongFeedbackInitialized = true;
             }
 
             let optionsHtml = '';
@@ -659,11 +704,8 @@
 
             const blurClass = (state === 'blurred') ? 'blurred' : '';
             
-            const duration = question.duration || 10;
-
             app.innerHTML = `
                 <div class="mb-4">Soal Ke-${data.event.current_question_seq}</div>
-                <div class="timer" id="timer-display">${duration}</div>
                 <div class="${blurClass}">
                     <div class="question-text">${question.question_text}</div>
                     <div class="options-container">
@@ -673,21 +715,13 @@
             `;
             clearCountdown();
 
-            // Manage Timer
+            handleWrongFeedback(data.wrong_answer, nextQuestionKey);
+
             if (state === 'unblurred') {
-                startLocalTimer(data.event.timer_started_at, data.event.timer_stopped_at, duration);
+                setActiveAudio('late', true);
+                lastAudioContext = { shouldPlay: true, key: 'late' };
             } else if (state === 'revealed' || state === 'blurred') {
-                clearInterval(timerInterval);
                 stopAudio(true);
-                const timerDisplay = document.getElementById('timer-display');
-                if (timerDisplay) {
-                    if (data.event.timer_stopped_at && data.event.timer_started_at) {
-                        const diff = data.event.timer_stopped_at - data.event.timer_started_at;
-                        timerDisplay.innerText = Math.max(0, duration - diff);
-                    } else {
-                        timerDisplay.innerText = state === 'blurred' ? String(duration) : '0';
-                    }
-                }
             }
         }
 
@@ -696,13 +730,16 @@
 
             if (!leaderboard.length) {
                 leaderboardList.innerHTML = `<div class="leaderboard-empty">Belum ada skor peserta.</div>`;
+                lastLeaderboardOrder = new Map();
                 return;
             }
 
             leaderboardList.innerHTML = leaderboard.map((item, index) => {
                 const teamText = item.team_name ? `<small class="text-white-50 d-block">${item.team_name}</small>` : '';
+                const previousIndex = lastLeaderboardOrder.get(item.id);
+                const movedClass = typeof previousIndex === 'number' && previousIndex !== index ? 'moved' : '';
                 return `
-                    <div class="leaderboard-item">
+                    <div class="leaderboard-item ${movedClass}">
                         <div class="rank-chip">${index + 1}</div>
                         <div>
                             <div class="fw-bold">${item.name}</div>
@@ -712,33 +749,10 @@
                     </div>
                 `;
             }).join('');
-        }
 
-        function startLocalTimer(startedAt, stoppedAt, duration) {
-            clearInterval(timerInterval);
-            const timerDisplay = document.getElementById('timer-display');
-            
-            const tick = () => {
-                const now = Math.floor(Date.now() / 1000);
-                const end = stoppedAt || now;
-                const elapsed = end - startedAt;
-                const remaining = Math.max(0, duration - elapsed);
-                
-                if (timerDisplay) {
-                    timerDisplay.innerText = remaining;
-                }
-
-                if (remaining <= 0 || stoppedAt) {
-                    clearInterval(timerInterval);
-                }
-
-                updateAudioForProgress(elapsed, remaining, duration, Boolean(stoppedAt));
-            };
-
-            tick();
-            if (!stoppedAt) {
-                timerInterval = setInterval(tick, 1000);
-            }
+            lastLeaderboardOrder = new Map(
+                leaderboard.map((item, index) => [item.id, index])
+            );
         }
 
         function clearCountdown() {
@@ -800,7 +814,7 @@
                 track.loop = true;
                 track.preload = 'auto';
             });
-            buzzerAudio.preload = 'auto';
+            wrongAnswerAudio.preload = 'auto';
         }
 
         function updateSoundButton() {
@@ -829,6 +843,10 @@
 
             audioMuted = nextMuted;
             updateSoundButton();
+            Object.values(audioTracks).forEach(track => {
+                track.muted = audioMuted;
+            });
+            wrongAnswerAudio.muted = audioMuted;
 
             if (audioMuted) {
                 pauseAllAudio(false);
@@ -880,53 +898,55 @@
 
         function resetBuzzerTracking(questionKey) {
             currentQuestionKey = questionKey;
-            buzzerPlayedForQuestion = false;
         }
 
-        function playBuzzerOnce() {
-            if (buzzerPlayedForQuestion || !canPlayAudio()) return;
-            buzzerPlayedForQuestion = true;
-            buzzerAudio.currentTime = 0;
-            buzzerAudio.play().catch(() => {});
+        function handleWrongFeedback(wrongAnswer, questionKey) {
+            if (!wrongAnswer || !wrongAnswer.marked_at) return;
+            if (lastWrongQuestionKey !== questionKey) {
+                lastWrongQuestionKey = questionKey;
+                lastWrongMarkAt = wrongAnswer.marked_at;
+                wrongFeedbackInitialized = true;
+                return;
+            }
+
+            if (!wrongFeedbackInitialized) {
+                lastWrongMarkAt = wrongAnswer.marked_at;
+                wrongFeedbackInitialized = true;
+                return;
+            }
+
+            if (lastWrongMarkAt && wrongAnswer.marked_at <= lastWrongMarkAt) {
+                return;
+            }
+
+            lastWrongMarkAt = wrongAnswer.marked_at;
+            triggerWrongFeedback();
         }
 
-        function updateAudioForProgress(elapsed, remaining, duration, stopped) {
-            if (duration <= 0) {
-                lastAudioContext = { shouldPlay: false, key: null };
-                pauseAllAudio(true);
-                return;
+        function triggerWrongFeedback() {
+            const app = document.getElementById('app');
+            if (!app) return;
+            const fallbackDuration = 1600;
+            let effectDurationMs = fallbackDuration;
+            if (!Number.isNaN(wrongAnswerAudio.duration) && Number.isFinite(wrongAnswerAudio.duration) && wrongAnswerAudio.duration > 0) {
+                effectDurationMs = Math.max(600, Math.round(wrongAnswerAudio.duration * 1000));
             }
-
-            if (remaining <= 0) {
-                lastAudioContext = { shouldPlay: false, key: null };
-                pauseAllAudio(true);
-                if (!stopped) {
-                    playBuzzerOnce();
-                }
-                return;
+            app.style.setProperty('--wrong-feedback-duration', `${effectDurationMs}ms`);
+            app.classList.remove('wrong-feedback');
+            void app.offsetWidth;
+            app.classList.add('wrong-feedback');
+            if (canPlayAudio()) {
+                wrongAnswerAudio.currentTime = 0;
+                wrongAnswerAudio.play().catch(() => {});
+                const handleEnded = () => {
+                    app.classList.remove('wrong-feedback');
+                    wrongAnswerAudio.removeEventListener('ended', handleEnded);
+                };
+                wrongAnswerAudio.addEventListener('ended', handleEnded);
             }
-
-            if (stopped) {
-                lastAudioContext = { shouldPlay: false, key: null };
-                pauseAllAudio(true);
-                return;
-            }
-
-            const progress = Math.min(1, Math.max(0, elapsed / duration));
-            const nextKey = progress < 0.7 ? 'early' : 'late';
-            lastAudioContext = { shouldPlay: true, key: nextKey };
-
-            if (!canPlayAudio()) {
-                return;
-            }
-
-            setActiveAudio(nextKey, nextKey !== currentAudioKey);
-        }
-
-        if (leaderboardToggle) {
-            leaderboardToggle.addEventListener('click', () => {
-                leaderboardPanel.classList.toggle('d-none');
-            });
+            window.setTimeout(() => {
+                app.classList.remove('wrong-feedback');
+            }, effectDurationMs);
         }
 
         if (fullscreenToggle) {

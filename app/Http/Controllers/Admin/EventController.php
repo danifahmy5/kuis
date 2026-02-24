@@ -650,6 +650,40 @@ class EventController extends Controller
         return back()->with('success', 'Poin berhasil diberikan.');
     }
 
+    public function markWrongAnswers(Request $request, Event $event)
+    {
+        $request->validate([
+            'wrong_contestant_ids' => 'required|array',
+            'wrong_contestant_ids.*' => 'required|integer|exists:contestants,id',
+        ]);
+
+        $currentQuestion = $event->questions()
+            ->wherePivot('seq', $event->current_question_seq)
+            ->first();
+
+        if (!$currentQuestion) {
+            return back()->withErrors(['wrong_contestant_ids' => 'Soal aktif tidak ditemukan.']);
+        }
+
+        foreach ($request->wrong_contestant_ids as $contestantId) {
+            EventAnswer::updateOrCreate(
+                [
+                    'event_id' => $event->id,
+                    'question_id' => $currentQuestion->id,
+                    'contestant_id' => $contestantId,
+                ],
+                [
+                    'is_correct' => false,
+                    'marked_by' => auth()->id(),
+                    'marked_at' => now(),
+                    'points_awarded' => 0,
+                ]
+            );
+        }
+
+        return back()->with('success', 'Jawaban salah berhasil ditandai.');
+    }
+
     public function updateAwardedPoints(Request $request, Event $event, EventAnswer $eventAnswer)
     {
         if ($eventAnswer->event_id !== $event->id) {

@@ -361,6 +361,55 @@
                                         </div>
                                     </div>
 
+                                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                        <div class="card-header bg-white">
+                                            <h6 class="fw-bold text-muted text-uppercase mb-0 ls-1">Tandai Jawaban Salah
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            @if ($event->question_state != 'revealed')
+                                                <form action="{{ route('events.mark-wrong', $event->id) }}" method="POST">
+                                                    @csrf
+                                                    <div class="card border bg-light mb-3">
+                                                        <div class="card-body p-0"
+                                                            style="max-height: 220px; overflow-y: auto;">
+                                                            <ul class="list-group list-group-flush text-start">
+                                                                @foreach ($event->contestants as $contestant)
+                                                                    <li class="list-group-item bg-transparent">
+                                                                        <div class="form-check custom-checkbox">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                name="wrong_contestant_ids[]"
+                                                                                value="{{ $contestant->id }}"
+                                                                                id="w-{{ $contestant->id }}"
+                                                                                {{ in_array($contestant->id, old('wrong_contestant_ids', [])) ? 'checked' : '' }}>
+                                                                            <label
+                                                                                class="form-check-label w-100 stretched-link"
+                                                                                for="w-{{ $contestant->id }}">
+                                                                                {{ $contestant->name }}
+                                                                                <span class="text-muted small">(total:
+                                                                                    {{ (int) ($contestantPoints[$contestant->id] ?? 0) }}
+                                                                                    poin)</span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        </div>
+                                                        <div class="card-footer bg-white border-top p-2 text-end">
+                                                            <button class="btn btn-danger px-3" type="submit">Tandai
+                                                                Salah</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            @else
+                                                <div class="text-muted small mb-0">
+                                                    Penandaan salah tersedia sebelum jawaban dibuka.
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
                                     <div class="card border-0 shadow-sm rounded-4">
                                         <div class="card-header bg-white">
                                             <h6 class="fw-bold text-muted text-uppercase mb-0 ls-1">Koreksi Poin Soal Ini

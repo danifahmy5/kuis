@@ -23,9 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::post('events/{event}/prev-question', [App\Http\Controllers\Admin\EventController::class, 'prevQuestion'])->name('events.prev-question');
     Route::post('events/{event}/unblur-question', [App\Http\Controllers\Admin\EventController::class, 'unblurQuestion'])->name('events.unblur-question');
     Route::post('events/{event}/reveal-answer', [App\Http\Controllers\Admin\EventController::class, 'revealAnswer'])->name('events.reveal-answer');
-        Route::post('events/{event}/award-points', [App\Http\Controllers\Admin\EventController::class, 'awardPoints'])->name('events.award-points');
-        Route::patch('events/{event}/award-points/{eventAnswer}', [App\Http\Controllers\Admin\EventController::class, 'updateAwardedPoints'])->name('events.award-points.update');
-        Route::post('events/{event}/stop-timer', [App\Http\Controllers\Admin\EventController::class, 'stopTimer'])->name('events.stop-timer');
+    Route::post('events/{event}/award-points', [App\Http\Controllers\Admin\EventController::class, 'awardPoints'])->name('events.award-points');
+    Route::patch('events/{event}/award-points/{eventAnswer}', [App\Http\Controllers\Admin\EventController::class, 'updateAwardedPoints'])->name('events.award-points.update');
+    Route::post('events/{event}/mark-wrong', [App\Http\Controllers\Admin\EventController::class, 'markWrongAnswers'])->name('events.mark-wrong');
+    Route::post('events/{event}/stop-timer', [App\Http\Controllers\Admin\EventController::class, 'stopTimer'])->name('events.stop-timer');
 
         Route::get('events/questions', [App\Http\Controllers\Admin\EventController::class, 'questionsIndex'])->name('events.questions.index');
         Route::get('events/{event}/questions', [App\Http\Controllers\Admin\EventController::class, 'editQuestions'])->name('events.questions.edit');

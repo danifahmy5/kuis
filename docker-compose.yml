@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: kuis-app
+    ports:
+      - "8011:8011"
+    volumes:
+      - .:/var/www
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: 192.168.1.100
+      DB_PORT: 3306
+      DB_DATABASE: kuis
+      DB_USERNAME: kuis_user
+      DB_PASSWORD: kuis_pass

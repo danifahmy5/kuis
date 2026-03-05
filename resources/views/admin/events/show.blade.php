@@ -30,6 +30,22 @@
             transition: all 0.3s ease;
         }
 
+        .admin-answer-stealth {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
+        .admin-answer-stealth .answer-badge {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.4rem;
+        }
+
+        .admin-answer-stealth .answer-text {
+            font-size: 0.82rem;
+            line-height: 1.2;
+            letter-spacing: 0.2px;
+        }
+
         /* Custom Scrollbar for contestants */
         .card-body::-webkit-scrollbar {
             width: 6px;
@@ -300,25 +316,26 @@
                                                     @endif
                                                 </div>
 
-                                                @if ($event->question_state == 'revealed')
-                                                    <div class="animate-fade-in mt-4">
-                                                        <div class="alert alert-success bg-success bg-opacity-10 border-success border-opacity-25 rounded-3 d-inline-block text-start px-4 py-3 mb-0"
-                                                            style="min-width: 300px;">
-                                                            <div
-                                                                class="text-uppercase text-success fw-bold small mb-2 opacity-75">
-                                                                Jawaban Benar</div>
-                                                            @foreach ($currentQuestion->options as $option)
-                                                                @if ($option->is_correct)
-                                                                    <div class="fs-4 text-dark">
-                                                                        <span
-                                                                            class="badge bg-success me-2">{{ $option->label }}</span>
-                                                                        {{ $option->option_text }}
-                                                                    </div>
-                                                                @endif
-                                                            @endforeach
+                                                <div
+                                                    class="{{ $event->question_state == 'revealed' ? 'animate-fade-in' : '' }} mt-4">
+                                                    <div class="alert alert-success bg-success bg-opacity-10 border-success border-opacity-25 rounded-3 d-inline-block text-start px-2 py-2 mb-0 admin-answer-stealth"
+                                                        style="min-width: 210px;">
+                                                        <div class="text-uppercase text-success fw-bold mb-1 opacity-75"
+                                                            style="font-size: 0.62rem;">
+                                                            Jawaban Benar (Admin)
                                                         </div>
+                                                        @foreach ($currentQuestion->options as $option)
+                                                            @if ($option->is_correct)
+                                                                <div class="text-dark answer-text">
+                                                                    <span class="badge bg-success me-1 answer-badge">
+                                                                        {{ $option->label }}
+                                                                    </span>
+                                                                    {{ $option->option_text }}
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
                                                     </div>
-                                                @endif
+                                                </div>
                                             @endif
                                         </div>
                                     </div>

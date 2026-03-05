@@ -704,12 +704,19 @@
         const soundToggle = document.getElementById('sound-toggle');
         const soundGate = document.getElementById('sound-gate');
         const soundGateUnmute = document.getElementById('sound-gate-unmute');
-        const heartbeatLateSrc = "{{ asset('heartbeat-02.mp3') }}";
+        const heartbeatLateSrc = "{{ asset('heartbeat-03.mp3') }}";
         const wrongAnswerSrc = "{{ asset('wrong-answer.mp3') }}";
         const showAnswerSrc = "{{ asset('show-answer.mp3') }}";
 
-        const audioTracks = {
-            late: new Audio(heartbeatLateSrc),
+        const audioTracks = {};
+        const lateLoopTracks = [new Audio(heartbeatLateSrc), new Audio(heartbeatLateSrc)];
+        const lateLoopState = {
+            activeIndex: 0,
+            crossfading: false,
+            monitorId: null,
+            fadeTimer: null,
+            overlapSec: 0.2,
+            targetVolume: 0.72
         };
         const wrongAnswerAudio = new Audio(wrongAnswerSrc);
         const showAnswerAudio = new Audio(showAnswerSrc);
@@ -951,6 +958,11 @@
                 track.loop = true;
                 track.preload = 'auto';
             });
+            lateLoopTracks.forEach(track => {
+                track.loop = false;
+                track.preload = 'auto';
+                track.volume = 0;
+            });
             wrongAnswerAudio.preload = 'auto';
             showAnswerAudio.preload = 'auto';
         }
@@ -984,6 +996,9 @@
             Object.values(audioTracks).forEach(track => {
                 track.muted = audioMuted;
             });
+            lateLoopTracks.forEach(track => {
+                track.muted = audioMuted;
+            });
             wrongAnswerAudio.muted = audioMuted;
             showAnswerAudio.muted = audioMuted;
 
@@ -999,6 +1014,7 @@
         }
 
         function pauseAllAudio(reset = false) {
+            stopLateLoop(reset);
             Object.values(audioTracks).forEach(track => {
                 track.pause();
                 if (reset) {
@@ -1013,7 +1029,11 @@
         function setActiveAudio(key, resetOnSwitch = true) {
             if (currentAudioKey === key) {
                 if (canPlayAudio()) {
-                    audioTracks[key].play().catch(() => {});
+                    if (key === 'late') {
+                        startLateLoop();
+                    } else if (audioTracks[key]) {
+                        audioTracks[key].play().catch(() => {});
+                    }
                 }
                 return;
             }
@@ -1026,8 +1046,118 @@
 
             currentAudioKey = key;
             if (canPlayAudio()) {
-                audioTracks[key].play().catch(() => {});
+                if (key === 'late') {
+                    startLateLoop();
+                } else if (audioTracks[key]) {
+                    audioTracks[key].play().catch(() => {});
+                }
             }
+        }
+
+        function startLateLoop() {
+            if (!canPlayAudio()) return;
+
+            const activeTrack = lateLoopTracks[lateLoopState.activeIndex];
+            const nextTrack = lateLoopTracks[1 - lateLoopState.activeIndex];
+
+            activeTrack.volume = lateLoopState.targetVolume;
+            nextTrack.volume = 0;
+
+            if (activeTrack.paused) {
+                activeTrack.play().catch(() => {});
+            }
+
+            ensureLateLoopMonitor();
+        }
+
+        function stopLateLoop(reset = true) {
+            if (lateLoopState.monitorId) {
+                cancelAnimationFrame(lateLoopState.monitorId);
+                lateLoopState.monitorId = null;
+            }
+            if (lateLoopState.fadeTimer) {
+                clearInterval(lateLoopState.fadeTimer);
+                lateLoopState.fadeTimer = null;
+            }
+
+            lateLoopTracks.forEach(track => {
+                track.pause();
+                track.volume = 0;
+                if (reset) {
+                    track.currentTime = 0;
+                }
+            });
+
+            if (reset) {
+                lateLoopState.activeIndex = 0;
+            }
+            lateLoopState.crossfading = false;
+        }
+
+        function ensureLateLoopMonitor() {
+            if (lateLoopState.monitorId) return;
+
+            const tick = () => {
+                if (currentAudioKey !== 'late' || !canPlayAudio()) {
+                    lateLoopState.monitorId = null;
+                    return;
+                }
+
+                const activeTrack = lateLoopTracks[lateLoopState.activeIndex];
+                const duration = activeTrack.duration;
+
+                if (Number.isFinite(duration) && duration > 0) {
+                    const remaining = duration - activeTrack.currentTime;
+                    if (!lateLoopState.crossfading && remaining <= lateLoopState.overlapSec) {
+                        crossfadeLateLoop();
+                    }
+                }
+
+                lateLoopState.monitorId = requestAnimationFrame(tick);
+            };
+
+            lateLoopState.monitorId = requestAnimationFrame(tick);
+        }
+
+        function crossfadeLateLoop() {
+            const fromIndex = lateLoopState.activeIndex;
+            const toIndex = 1 - fromIndex;
+            const fromTrack = lateLoopTracks[fromIndex];
+            const toTrack = lateLoopTracks[toIndex];
+
+            lateLoopState.crossfading = true;
+            toTrack.currentTime = 0;
+            toTrack.volume = 0;
+            toTrack.play().catch(() => {});
+
+            const durationMs = Math.max(120, Math.round(lateLoopState.overlapSec * 1000));
+            const stepMs = 16;
+            const totalSteps = Math.max(1, Math.ceil(durationMs / stepMs));
+            let step = 0;
+
+            if (lateLoopState.fadeTimer) {
+                clearInterval(lateLoopState.fadeTimer);
+            }
+
+            lateLoopState.fadeTimer = setInterval(() => {
+                step += 1;
+                const progress = Math.min(1, step / totalSteps);
+                const eased = 1 - Math.pow(1 - progress, 2);
+
+                fromTrack.volume = lateLoopState.targetVolume * (1 - eased);
+                toTrack.volume = lateLoopState.targetVolume * eased;
+
+                if (progress >= 1) {
+                    clearInterval(lateLoopState.fadeTimer);
+                    lateLoopState.fadeTimer = null;
+                    fromTrack.pause();
+                    fromTrack.currentTime = 0;
+                    fromTrack.volume = 0;
+                    toTrack.volume = lateLoopState.targetVolume;
+                    lateLoopState.activeIndex = toIndex;
+                    lateLoopState.crossfading = false;
+                }
+            }, stepMs);
         }
 
         function stopAudio(reset = true) {

@@ -9,7 +9,7 @@ COPY public ./public
 RUN npm run build
 
 # PHP app
-FROM php:8.4-cli
+FROM php:8.4-fpm
 
 # System deps
 RUN apt-get update \
@@ -61,6 +61,4 @@ COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
 USER app
 
-EXPOSE 8011
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8011"]
+EXPOSE 9000

@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $event->title }} - Quiz Display</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary-gold: #FFD700;
@@ -53,6 +56,7 @@
             z-index: 0;
             animation: float 10s infinite ease-in-out;
         }
+
         .orb-1 {
             top: -10%;
             left: -10%;
@@ -60,6 +64,7 @@
             height: 50vw;
             background: rgba(44, 62, 80, 0.5);
         }
+
         .orb-2 {
             bottom: -20%;
             right: -10%;
@@ -466,73 +471,166 @@
         }
 
         @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+            }
         }
 
         @keyframes float {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(20px, 40px); }
-            100% { transform: translate(0, 0); }
+            0% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(20px, 40px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes leaderboardMove {
-            0% { transform: scale(1); }
-            35% { transform: scale(1.03); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            35% {
+                transform: scale(1.03);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-8px); }
-            80% { transform: translateX(8px); }
-            100% { transform: translateX(0); }
+            0% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-10px);
+            }
+
+            40% {
+                transform: translateX(10px);
+            }
+
+            60% {
+                transform: translateX(-8px);
+            }
+
+            80% {
+                transform: translateX(8px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
         }
 
         @keyframes redPulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.2); }
-            50% { box-shadow: 0 0 40px 8px rgba(255, 85, 85, 0.45); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.2); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 40px 8px rgba(255, 85, 85, 0.45);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 85, 85, 0.2);
+            }
         }
 
         @keyframes redTint {
-            0% { box-shadow: 0 0 0 rgba(255, 85, 85, 0); }
-            50% { box-shadow: 0 0 30px rgba(255, 85, 85, 0.45); }
-            100% { box-shadow: 0 0 0 rgba(255, 85, 85, 0); }
+            0% {
+                box-shadow: 0 0 0 rgba(255, 85, 85, 0);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 85, 85, 0.45);
+            }
+
+            100% {
+                box-shadow: 0 0 0 rgba(255, 85, 85, 0);
+            }
         }
 
         @media (max-width: 768px) {
-            .event-title { font-size: 2.5rem; }
-            .glass-card { padding: 2rem; width: 95%; }
-            .options-container { grid-template-columns: 1fr; }
-            .question-text { font-size: 1.6rem; }
-            .intro-title { font-size: 2.5rem; }
-            .intro-desc { font-size: 1.4rem; }
-            .countdown-container { gap: 1rem; }
-            .countdown-number { font-size: 2rem; }
+            .event-title {
+                font-size: 2.5rem;
+            }
+
+            .glass-card {
+                padding: 2rem;
+                width: 95%;
+            }
+
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+
+            .question-text {
+                font-size: 1.6rem;
+            }
+
+            .intro-title {
+                font-size: 2.5rem;
+            }
+
+            .intro-desc {
+                font-size: 1.4rem;
+            }
+
+            .countdown-container {
+                gap: 1rem;
+            }
+
+            .countdown-number {
+                font-size: 2rem;
+            }
+
             .display-topbar {
                 top: 12px;
                 left: 12px;
                 right: 12px;
             }
+
             .branding-text {
                 display: none;
             }
+
             .topbar-btn {
                 padding: 8px 12px;
                 font-size: 0.82rem;
             }
+
             .display-layout {
                 grid-template-columns: 1fr;
             }
+
             .display-footer {
                 right: 12px;
                 bottom: 10px;
@@ -541,6 +639,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="bg-container">
         <div class="bg-overlay"></div>
@@ -608,7 +707,7 @@
         const heartbeatLateSrc = "{{ asset('heartbeat-02.mp3') }}";
         const wrongAnswerSrc = "{{ asset('wrong-answer.mp3') }}";
         const showAnswerSrc = "{{ asset('show-answer.mp3') }}";
-        
+
         const audioTracks = {
             late: new Audio(heartbeatLateSrc),
         };
@@ -617,7 +716,10 @@
         let currentAudioKey = null;
         let audioEnabled = false;
         let audioMuted = true;
-        let lastAudioContext = { shouldPlay: false, key: null };
+        let lastAudioContext = {
+            shouldPlay: false,
+            key: null
+        };
         let currentQuestionKey = null;
         let lastWrongMarkAt = null;
         let lastWrongQuestionKey = null;
@@ -638,7 +740,7 @@
         function updateUI(data) {
             const app = document.getElementById('app');
             renderLeaderboard(data.leaderboard || []);
-            
+
             // Check if intro
             if (data.event.is_intro) {
                 clearCountdown();
@@ -702,18 +804,19 @@
             if (question.options && visibleCount > 0) {
                 question.options.slice(0, visibleCount).forEach(opt => {
                     const isCorrectClass = (state === 'revealed' && opt.is_correct) ? 'correct' : '';
-                    optionsHtml += `<div class="option-item ${isCorrectClass}">${opt.label}. ${opt.option_text}</div>`;
+                    optionsHtml +=
+                        `<div class="option-item ${isCorrectClass}">${opt.label}. ${opt.option_text}</div>`;
                 });
             }
 
             app.innerHTML = `
                 <div class="mb-4">Soal Ke-${data.event.current_question_seq}</div>
                 ${state === 'hidden' ? '<div class="intro-desc">Menunggu host menampilkan soal...</div>' : `
-                    <div class="question-text">${question.question_text}</div>
-                    <div class="options-container">
-                        ${optionsHtml}
-                    </div>
-                `}
+                        <div class="question-text">${question.question_text}</div>
+                        <div class="options-container">
+                            ${optionsHtml}
+                        </div>
+                    `}
             `;
             clearCountdown();
 
@@ -727,7 +830,10 @@
 
             if (['question', 'option_a', 'option_b', 'option_c', 'option_d'].includes(state)) {
                 setActiveAudio('late', true);
-                lastAudioContext = { shouldPlay: true, key: 'late' };
+                lastAudioContext = {
+                    shouldPlay: true,
+                    key: 'late'
+                };
             } else if (state === 'revealed' || state === 'hidden' || state === null) {
                 stopAudio(true);
             }
@@ -743,7 +849,8 @@
             }
 
             leaderboardList.innerHTML = leaderboard.map((item, index) => {
-                const teamText = item.team_name ? `<small class="text-white-50 d-block">${item.team_name}</small>` : '';
+                const teamText = item.team_name ? `<small class="text-white-50 d-block">${item.team_name}</small>` :
+                    '';
                 const previousIndex = lastLeaderboardOrder.get(item.id);
                 const movedClass = typeof previousIndex === 'number' && previousIndex !== index ? 'moved' : '';
                 return `
@@ -924,7 +1031,10 @@
         }
 
         function stopAudio(reset = true) {
-            lastAudioContext = { shouldPlay: false, key: null };
+            lastAudioContext = {
+                shouldPlay: false,
+                key: null
+            };
             pauseAllAudio(reset);
         }
 
@@ -960,7 +1070,8 @@
             if (!app) return;
             const fallbackDuration = 1600;
             let effectDurationMs = fallbackDuration;
-            if (!Number.isNaN(wrongAnswerAudio.duration) && Number.isFinite(wrongAnswerAudio.duration) && wrongAnswerAudio.duration > 0) {
+            if (!Number.isNaN(wrongAnswerAudio.duration) && Number.isFinite(wrongAnswerAudio.duration) && wrongAnswerAudio
+                .duration > 0) {
                 effectDurationMs = Math.max(600, Math.round(wrongAnswerAudio.duration * 1000));
             }
             app.style.setProperty('--wrong-feedback-duration', `${effectDurationMs}ms`);
@@ -1027,4 +1138,5 @@
         fetchState();
     </script>
 </body>
+
 </html>

@@ -61,6 +61,15 @@
             animation: fadeIn 0.5s ease-in;
         }
 
+        .event-switch-item.active {
+            border-color: #0d6efd !important;
+            background: rgba(13, 110, 253, 0.08);
+        }
+
+        .event-switch-item.active .event-switch-title {
+            color: #0d6efd;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -108,10 +117,16 @@
                                                 {{ $event->created_at->format('d M Y, H:i') }}</span>
                                         </div>
                                     </div>
-                                    <a href="{{ route('events.questions.index') }}"
-                                        class="btn btn-outline-secondary btn-sm">
-                                        &larr; Kembali
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            data-bs-toggle="modal" data-bs-target="#eventSwitcherModal">
+                                            <i class="bi bi-list-task me-1"></i>Pilih Acara
+                                        </button>
+                                        <a href="{{ route('events.questions.index') }}"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            &larr; Kembali
+                                        </a>
+                                    </div>
                                 </div>
 
                                 @php
@@ -502,6 +517,66 @@
                             </div>
                         </div>
                     @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="eventSwitcherModal" tabindex="-1" aria-labelledby="eventSwitcherModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventSwitcherModalLabel">
+                        <i class="bi bi-calendar-event me-2"></i>Pilih Acara
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach ($eventSwitcherEvents as $switchEvent)
+                            @php
+                                $isActiveEvent = $switchEvent->id === $event->id;
+                                $statusClass = match ($switchEvent->status) {
+                                    'draft' => 'bg-secondary',
+                                    'running' => 'bg-success',
+                                    'paused' => 'bg-warning text-dark',
+                                    'finished' => 'bg-dark',
+                                    default => 'bg-light text-dark',
+                                };
+                                $statusLabel = match ($switchEvent->status) {
+                                    'draft' => 'Draft',
+                                    'running' => 'Berlangsung',
+                                    'paused' => 'Jeda',
+                                    'finished' => 'Selesai',
+                                    default => ucfirst($switchEvent->status),
+                                };
+                            @endphp
+                            <a href="{{ route('events.show', $switchEvent->id) }}"
+                                class="list-group-item list-group-item-action event-switch-item {{ $isActiveEvent ? 'active' : '' }}">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <div class="fw-semibold event-switch-title">{{ $switchEvent->title }}</div>
+                                        <div class="small text-muted">
+                                            #{{ $switchEvent->id }} •
+                                            {{ $switchEvent->created_at->format('d M Y, H:i') }}
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                        @if ($isActiveEvent)
+                                            <div class="small text-primary mt-1 fw-semibold">
+                                                <i class="bi bi-check2-circle me-1"></i>Sedang dibuka
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>

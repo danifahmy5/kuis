@@ -78,6 +78,11 @@ class EventController extends Controller
             $query->orderByPivot('seq');
         }, 'contestants']);
 
+        $eventSwitcherEvents = Event::query()
+            ->select(['id', 'title', 'status', 'created_at'])
+            ->latest()
+            ->get();
+
         $contestantPoints = $event->answers()
             ->selectRaw('contestant_id, COALESCE(SUM(points_awarded), 0) as total_points')
             ->groupBy('contestant_id')
@@ -102,7 +107,13 @@ class EventController extends Controller
             }
         }
 
-        return view('admin.events.show', compact('event', 'currentQuestion', 'contestantPoints', 'currentQuestionAnswers'));
+        return view('admin.events.show', compact(
+            'event',
+            'currentQuestion',
+            'contestantPoints',
+            'currentQuestionAnswers',
+            'eventSwitcherEvents'
+        ));
     }
 
     public function questionsIndex()

@@ -156,6 +156,39 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
+        .event-switcher-modal .modal-content {
+            background: rgba(7, 20, 42, 0.95);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .event-switcher-modal .modal-header,
+        .event-switcher-modal .modal-footer {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .event-switch-item {
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .event-switch-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .event-switch-item.active {
+            background: rgba(255, 215, 0, 0.16);
+            border-color: rgba(255, 215, 0, 0.7);
+        }
+
+        .event-switch-item.active .event-switch-title {
+            color: var(--primary-gold);
+        }
+
         .leaderboard-panel {
             width: 100%;
             max-height: calc(100vh - 140px);
@@ -655,6 +688,9 @@
             <span class="branding-text">Quiz Arena</span>
         </div>
         <div class="topbar-actions">
+            <button type="button" class="topbar-btn" data-bs-toggle="modal" data-bs-target="#eventSwitcherModal">
+                <i class="fas fa-calendar-alt me-1"></i>Pilih Acara
+            </button>
             <button type="button" class="topbar-btn" id="sound-toggle">
                 <i class="fas fa-volume-mute me-1"></i>Unmute
             </button>
@@ -693,6 +729,66 @@
             <button type="button" class="sound-gate-btn" id="sound-gate-unmute">
                 <i class="fas fa-volume-up me-1"></i>Unmute
             </button>
+        </div>
+    </div>
+
+    <div class="modal fade event-switcher-modal" id="eventSwitcherModal" tabindex="-1"
+        aria-labelledby="eventSwitcherModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventSwitcherModalLabel">
+                        <i class="fas fa-calendar-check me-2"></i>Pilih Acara
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach ($eventSwitcherEvents as $switchEvent)
+                            @php
+                                $isActiveEvent = $switchEvent->id === $event->id;
+                                $statusClass = match ($switchEvent->status) {
+                                    'draft' => 'bg-secondary',
+                                    'running' => 'bg-success',
+                                    'paused' => 'bg-warning text-dark',
+                                    'finished' => 'bg-dark',
+                                    default => 'bg-light text-dark',
+                                };
+                                $statusLabel = match ($switchEvent->status) {
+                                    'draft' => 'Draft',
+                                    'running' => 'Berlangsung',
+                                    'paused' => 'Jeda',
+                                    'finished' => 'Selesai',
+                                    default => ucfirst($switchEvent->status),
+                                };
+                            @endphp
+                            <a href="{{ route('display', $switchEvent->id) }}"
+                                class="list-group-item list-group-item-action event-switch-item {{ $isActiveEvent ? 'active' : '' }}">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <div class="fw-semibold event-switch-title">{{ $switchEvent->title }}</div>
+                                        <div class="small text-white-50">
+                                            #{{ $switchEvent->id }} • {{ $switchEvent->created_at->format('d M Y, H:i') }}
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                        @if ($isActiveEvent)
+                                            <div class="small mt-1 fw-semibold" style="color: var(--primary-gold);">
+                                                <i class="fas fa-check-circle me-1"></i>Sedang dibuka
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1269,6 +1365,7 @@
         setInterval(fetchState, 1000);
         fetchState();
     </script>
+    <script src="{{ asset('css/bootstrap.bundle.min.js') }}"></script>
 </body>
 
 </html>

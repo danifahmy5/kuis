@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\EventAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,12 @@ class HomeController extends Controller
 
     public function display(\App\Models\Event $event)
     {
-        return view('display', compact('event'));
+        $eventSwitcherEvents = Event::query()
+            ->select(['id', 'title', 'status', 'created_at'])
+            ->latest()
+            ->get();
+
+        return view('display', compact('event', 'eventSwitcherEvents'));
     }
 
     public function displayState(\App\Models\Event $event)

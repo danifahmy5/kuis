@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
         Route::post('events/{event}/questions/import', [App\Http\Controllers\Admin\EventController::class, 'importQuestions'])->name('events.questions.import');
 
         Route::resource('events', App\Http\Controllers\Admin\EventController::class)->whereNumber('event');
+        Route::delete('questions', [App\Http\Controllers\Admin\QuestionController::class, 'destroyAll'])->name('questions.destroy-all');
         Route::resource('questions', App\Http\Controllers\Admin\QuestionController::class);
     Route::resource('contestants', App\Http\Controllers\Admin\ContestantController::class);
 });

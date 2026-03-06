@@ -137,4 +137,22 @@ class QuestionController extends Controller
         return redirect()->route('questions.index')
             ->with('success', 'Soal berhasil dihapus.');
     }
+
+    /**
+     * Remove all questions from storage.
+     */
+    public function destroyAll()
+    {
+        $deletedCount = Question::count();
+
+        if ($deletedCount === 0) {
+            return redirect()->route('questions.index')
+                ->with('success', 'Tidak ada soal untuk dihapus.');
+        }
+
+        Question::query()->delete();
+
+        return redirect()->route('questions.index')
+            ->with('success', "{$deletedCount} soal berhasil dihapus.");
+    }
 }

@@ -13,6 +13,13 @@
             </nav>
         </div>
         <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <form action="{{ route('questions.destroy-all') }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus semua soal? Tindakan ini tidak dapat dibatalkan.')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-outline-danger shadow-sm me-2">
+                    <i class="fas fa-trash-alt me-1"></i> Hapus Semua Soal
+                </button>
+            </form>
             <a href="{{ route('questions.create') }}" class="btn btn-success shadow-sm text-white">
                 <i class="fas fa-plus me-1"></i> Tambah Soal Baru
             </a>

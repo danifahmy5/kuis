@@ -635,6 +635,20 @@ class EventController extends Controller
         return back();
     }
 
+    public function startTimer(Event $event)
+    {
+        if (!$event->current_question_seq) {
+            return back()->withErrors(['timer' => 'Soal aktif tidak ditemukan.']);
+        }
+
+        $event->update([
+            'timer_started_at' => now()->timestamp,
+            'timer_stopped_at' => null,
+        ]);
+
+        return back()->with('success', 'Timer soal dimulai.');
+    }
+
     public function stopTimer(Event $event)
     {
         $event->update([

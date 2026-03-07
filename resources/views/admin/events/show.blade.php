@@ -325,6 +325,17 @@
                                                         </button>
                                                     </form>
 
+                                                    <form action="{{ route('events.start-timer', $event->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="btn btn-warning btn-lg rounded-pill px-4 py-3 shadow-sm"
+                                                            {{ $event->question_state === 'revealed' ? 'disabled' : '' }}>
+                                                            <i class="bi bi-stopwatch me-2"></i>
+                                                            {{ $event->timer_started_at ? 'Restart Timer' : 'Start Timer' }}
+                                                        </button>
+                                                    </form>
+
                                                     @if ($event->question_state === 'option_d')
                                                         <form action="{{ route('events.reveal-answer', $event->id) }}"
                                                             method="POST">

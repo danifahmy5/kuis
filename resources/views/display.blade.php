@@ -916,6 +916,20 @@
 
             app.innerHTML = `
                 <div class="mb-4">Soal Ke-${data.event.current_question_seq}</div>
+                <div class="countdown-container mt-3 mb-4" id="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes">00</span>
+                        <span class="countdown-label">Menit</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number">:</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="seconds">00</span>
+                        <span class="countdown-label">Detik</span>
+                    </div>
+                </div>
+                <p class="text-white-50 mb-4" id="countdown-note"></p>
                 ${state === 'hidden' ? '<div class="intro-desc">Menunggu host menampilkan soal...</div>' : `
                         <div class="question-text">${question.question_text}</div>
                         <div class="options-container">
@@ -923,7 +937,11 @@
                         </div>
                     `}
             `;
-            clearCountdown();
+            startQuestionCountdown(
+                Number(question.duration),
+                data.event.timer_started_at,
+                data.event.timer_stopped_at
+            );
 
             handleWrongFeedback(data.wrong_answer, nextQuestionKey);
 
@@ -1036,6 +1054,71 @@
 
             update();
             countdownInterval = setInterval(update, 1000);
+        }
+
+        function startQuestionCountdown(durationSeconds, timerStartedAt, timerStoppedAt) {
+            clearCountdown();
+            const minutesSpan = document.getElementById('minutes');
+            const secondsSpan = document.getElementById('seconds');
+            const note = document.getElementById('countdown-note');
+
+            if (!minutesSpan || !secondsSpan) return;
+
+            const safeDuration = Number.isFinite(durationSeconds) && durationSeconds > 0 ?
+                Math.floor(durationSeconds) :
+                0;
+
+            const setRemaining = (remaining, message = '') => {
+                const minutes = Math.floor((remaining / 60) % 60);
+                const seconds = remaining % 60;
+                minutesSpan.textContent = String(minutes).padStart(2, '0');
+                secondsSpan.textContent = String(seconds).padStart(2, '0');
+                if (note) note.textContent = message;
+            };
+
+            if (safeDuration <= 0) {
+                setRemaining(0, 'Durasi soal tidak valid.');
+                return;
+            }
+
+            if (!timerStartedAt) {
+                setRemaining(safeDuration, 'Timer belum dimulai oleh host.');
+                return;
+            }
+
+            const startedAtMs = Number(timerStartedAt) * 1000;
+            if (!Number.isFinite(startedAtMs) || startedAtMs <= 0) {
+                setRemaining(safeDuration, 'Timer belum dimulai oleh host.');
+                return;
+            }
+
+            const parsedStoppedAt = Number(timerStoppedAt);
+            const hasStoppedTimer = Number.isFinite(parsedStoppedAt) && parsedStoppedAt > 0;
+            const stoppedAtMs = hasStoppedTimer ? parsedStoppedAt * 1000 : null;
+
+            const update = () => {
+                const currentMs = hasStoppedTimer ? stoppedAtMs : Date.now();
+                const elapsed = Math.max(0, Math.floor((currentMs - startedAtMs) / 1000));
+                const remaining = Math.max(0, safeDuration - elapsed);
+
+                let message = '';
+                if (remaining <= 0) {
+                    message = 'Waktu habis.';
+                } else if (hasStoppedTimer) {
+                    message = 'Timer dihentikan host.';
+                }
+
+                setRemaining(remaining, message);
+
+                if (remaining <= 0 || hasStoppedTimer) {
+                    clearCountdown();
+                }
+            };
+
+            update();
+            if (!hasStoppedTimer) {
+                countdownInterval = setInterval(update, 1000);
+            }
         }
 
         function isFullscreenActive() {

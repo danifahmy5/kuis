@@ -805,6 +805,7 @@
         const heartbeatLateSrc = "{{ asset('heartbeat-03.mp3') }}";
         const wrongAnswerSrc = "{{ asset('wrong-answer.mp3') }}";
         const showAnswerSrc = "{{ asset('show-answer.mp3') }}";
+        const buzzerSrc = "{{ asset('buzzer.mp3') }}";
 
         const audioTracks = {};
         const lateLoopTracks = [new Audio(heartbeatLateSrc), new Audio(heartbeatLateSrc)];
@@ -818,6 +819,7 @@
         };
         const wrongAnswerAudio = new Audio(wrongAnswerSrc);
         const showAnswerAudio = new Audio(showAnswerSrc);
+        const buzzerAudio = new Audio(buzzerSrc);
         let currentAudioKey = null;
         let audioEnabled = false;
         let audioMuted = true;
@@ -831,6 +833,7 @@
         let lastLeaderboardOrder = new Map();
         let wrongFeedbackInitialized = false;
         let lastQuestionState = null;
+        let lastTimeUpBuzzerKey = null;
 
         async function fetchState() {
             try {
@@ -940,7 +943,8 @@
             startQuestionCountdown(
                 Number(question.duration),
                 data.event.timer_started_at,
-                data.event.timer_stopped_at
+                data.event.timer_stopped_at,
+                `${nextQuestionKey}:${data.event.timer_started_at || 0}`
             );
 
             handleWrongFeedback(data.wrong_answer, nextQuestionKey);
@@ -1056,7 +1060,7 @@
             countdownInterval = setInterval(update, 1000);
         }
 
-        function startQuestionCountdown(durationSeconds, timerStartedAt, timerStoppedAt) {
+        function startQuestionCountdown(durationSeconds, timerStartedAt, timerStoppedAt, timerRunKey) {
             clearCountdown();
             const minutesSpan = document.getElementById('minutes');
             const secondsSpan = document.getElementById('seconds');
@@ -1104,6 +1108,7 @@
                 let message = '';
                 if (remaining <= 0) {
                     message = 'Waktu habis.';
+                    playTimeUpBuzzer(timerRunKey);
                 } else if (hasStoppedTimer) {
                     message = 'Timer dihentikan host.';
                 }
@@ -1146,6 +1151,7 @@
             });
             wrongAnswerAudio.preload = 'auto';
             showAnswerAudio.preload = 'auto';
+            buzzerAudio.preload = 'auto';
         }
 
         function updateSoundButton() {
@@ -1182,6 +1188,7 @@
             });
             wrongAnswerAudio.muted = audioMuted;
             showAnswerAudio.muted = audioMuted;
+            buzzerAudio.muted = audioMuted;
 
             if (audioMuted) {
                 pauseAllAudio(false);
@@ -1407,6 +1414,14 @@
             if (!canPlayAudio()) return;
             showAnswerAudio.currentTime = 0;
             showAnswerAudio.play().catch(() => {});
+        }
+
+        function playTimeUpBuzzer(timerRunKey) {
+            if (!timerRunKey || lastTimeUpBuzzerKey === timerRunKey) return;
+            lastTimeUpBuzzerKey = timerRunKey;
+            if (!canPlayAudio()) return;
+            buzzerAudio.currentTime = 0;
+            buzzerAudio.play().catch(() => {});
         }
 
         if (fullscreenToggle) {

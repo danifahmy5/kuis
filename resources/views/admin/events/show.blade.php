@@ -31,19 +31,19 @@
         }
 
         .admin-answer-stealth {
-            font-size: 0.75rem;
-            opacity: 0.85;
+            font-size: 1rem;
+            opacity: 1;
         }
 
         .admin-answer-stealth .answer-badge {
-            font-size: 0.65rem;
-            padding: 0.2rem 0.4rem;
+            font-size: 0.95rem;
+            padding: 0.35rem 0.6rem;
         }
 
         .admin-answer-stealth .answer-text {
-            font-size: 0.82rem;
-            line-height: 1.2;
-            letter-spacing: 0.2px;
+            font-size: 1.05rem;
+            line-height: 1.35;
+            letter-spacing: 0;
         }
 
         /* Custom Scrollbar for contestants */
@@ -102,7 +102,13 @@
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h2 class="fw-bold">{{ $event->title }}</h2>
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <h2 class="fw-bold mb-0">{{ $event->title }}</h2>
+                                            <span
+                                                class="badge rounded-pill bg-primary text-white px-3 py-2 fs-6 fw-semibold">
+                                                {{ $event->questions->count() }} soal
+                                            </span>
+                                        </div>
                                         <div class="mt-1">
                                             @if ($event->status == 'draft')
                                                 <span class="badge rounded-pill bg-secondary px-3">Draft</span>
@@ -160,7 +166,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-7">
+                                        <div class="col-md-9">
                                             <h6 class="text-muted text-uppercase small fw-bold mb-2">Daftar Peserta</h6>
                                             @if ($event->contestants->isEmpty())
                                                 <span class="text-muted fst-italic">Belum ada peserta terdaftar.</span>
@@ -333,10 +339,10 @@
 
                                                 <div
                                                     class="{{ $event->question_state == 'revealed' ? 'animate-fade-in' : '' }} mt-4">
-                                                    <div class="alert alert-success bg-success bg-opacity-10 border-success border-opacity-25 rounded-3 d-inline-block text-start px-2 py-2 mb-0 admin-answer-stealth"
-                                                        style="min-width: 210px;">
+                                                    <div class="alert alert-success bg-success bg-opacity-10 border-success border-opacity-25 rounded-3 d-inline-block text-start px-3 py-3 mb-0 admin-answer-stealth"
+                                                        style="min-width: 300px;">
                                                         <div class="text-uppercase text-success fw-bold mb-1 opacity-75"
-                                                            style="font-size: 0.62rem;">
+                                                            style="font-size: 0.82rem;">
                                                             Jawaban Benar (Admin)
                                                         </div>
                                                         @foreach ($currentQuestion->options as $option)

@@ -806,6 +806,7 @@
         const wrongAnswerSrc = "{{ asset('wrong-answer.mp3') }}";
         const showAnswerSrc = "{{ asset('show-answer.mp3') }}";
         const buzzerSrc = "{{ asset('buzzer.mp3') }}";
+        const QUESTION_TIMER_SECONDS = 5;
 
         const audioTracks = {};
         const lateLoopTracks = [new Audio(heartbeatLateSrc), new Audio(heartbeatLateSrc)];
@@ -941,7 +942,7 @@
                     `}
             `;
             startQuestionCountdown(
-                Number(question.duration),
+                QUESTION_TIMER_SECONDS,
                 data.event.timer_started_at,
                 data.event.timer_stopped_at,
                 `${nextQuestionKey}:${data.event.timer_started_at || 0}`
